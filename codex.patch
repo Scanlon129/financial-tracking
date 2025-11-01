@@ -1,0 +1,2078 @@
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000000000000000000000000000000000000..0a493a0d5de4846dbe94dad3f609ec3447000ac2
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,11 @@
++.env
++__pycache__/
++*.pyc
++*.pyo
++*.pyd
++backend/app.db
++backend/.venv/
++frontend/node_modules/
++frontend/dist/
++samples/
++.DS_Store
+diff --git a/README.md b/README.md
+index 9d84ad8ff2de12139f44298e8af2a7300b9c7915..5ff1cce85fca3e205d95469d8586d97541540b07 100644
+GIT binary patch
+literal 3934
+zcmai1?QY}775&erxUd7Ptw_|SNs(gvOKZyuA&#y3V}qb*#W6XSrY1S;%uu$1{n2;G
+z8|F!R?j2I1cas({43RT)=YE`f&gC&Znp)MlQRO5!l|Pw!og_2LZ5@=UwKKoyf*S3-
+ztyS4=)>J6Jd9cbA6gDc5ob;6AEj^a@c}%Jec9N^0*OpCq-coy&2V-lG<+`BO<MnJY
+zY3#FhxWwt)R+X*`C7bBcI(le}wGQwprMrOv+*H$pCM;+laCU1HElXtz;zK)Xo6@QR
+z%XD`8k@QPrUGVhiY()>Me)8nod_&69*+zLirgP(SyVY(?vr4~=>C6N(ri-ih*JJvq
+z>&lL4sdh_MM%RC|8(pe2Nsf={LaWd^?UQ6eqtS)(VYXc0mi!5!j7Icq!iH}Dc4>l^
+zJQ_G$=UP&5GrzqfY-_Bk**`e{I!}EDHF6en(IwB+-mEvlr*i9!MrIF1!L3r3t?{iY
+zCH;fa?Cs1JNMJM*!!mVVwgsy4XiDAXQ2dOk^}9M}AFJ+GoLAl>9^gmgPImuw-MIk6
+zfW+8Z16HUp)}kw4RQ}|;(KW1dA_2rlvu>SwDD`QKmP;Bd4>0u^_LXvhHd+<hQK5qt
+zsG-gc*Pbt9bXmX#_3scN!KgloF-R0buh~6p-B|nNae;%?orG5ypj7bQgPAxhZ2ozp
+zYsvv+T?cfNC*@FZXSb%%MRfe!0u-^M3Jrwrfc60Ut!D#qmCkI{Sg&I?iC0hy_MLkM
+zxptv#BJw`yAc5WTOI<J;k7?=9O#g0;2i^peomoEp*$pUuP-ThsDQ%7)JN6Q}=h#(w
+zN`opq=@>tX(nInW$<g%Cp|20eZ04mwh_BMZDCyEDrRee}Asr+7uH5WIl6;fmO|zpc
+z)%7;jFRE%vol&syO(uY9Y}1yY8a(WVSG`LTBFeJt0ldUN^M;0Y<e}RlTPKuVFXvaY
+z#R|w<{V@MIqu>7XD;ku+=evCD`Ra8d#FIfXaNWV&kJsn(%V>;Q#sL!OP|&D;RBajh
+zOjowhB`wa$JYvZMYXD9(w7i@x&R1ubi}}^vYH^;8DT}Xe=Vv$byTkMR>SMe}P{6#3
+zWN~#nenezw-{emz&1(<dqMdDB?*N0OE8J&5R$FCCP6IkmTt_{Ovo#|)LcdgPoo~Jb
+z@)uQzY)oIBtetLXvZXiwJboj!pilIo+}fY+i^7P$Y2%FmYyOlZeLV|lrU^Pj+NFi5
+z$wO<(f_E?(zmF752iKugn-H3J)2RS{V|{q{m$z@<(n(L-Fp9<vluh|pCWLc=FhSYH
+zfnUjMw?$@u&)#?6eE)5S<$GysuCr>I(f}_#rbnZD5vZX$F@dr^F^D_X!WGgYtZr=P
+zs5>>3!Xp&d0VXKuXmraAErKIegh^;&<RC5#L{sIt_E2LBbrQ%zZ8bq!*E&tUP3a!Y
+zGa4PuUd#6pECEIw#*SQD>Iqtk6M(E7D1rT6vmhf(VC=h;K18Z#li1b?4{V8x5)oh2
+zEgZo)KAI+fPU%K(jef?ty>L;bgEL$nT-xgvY(*}CUm$GhseUx+s&KBiy0nb|wYD88
+z_SgUoqq5LrgZ^g1E?J)0K7lnv!lzv$u>qfkmyj_{?m;0_%tsdYui-Sy@QK%&GSpH~
+zGi_i-A-n&=1Qh{whf;O}0kW?+mAH2c4>+uj8oJvLgBWdX*;blPddF6LI9j}Kq>Mi7
+zO0F{)R@$QG<}B^n<Py-{CGYa7kZ9ieU@Hs=lDYc@NA@1`phGqtbwbT`_FiK?Iq5B+
+zVrVpsBFkOau%_;yw;-=Ed0}YAwLg`FLN6hooYPKZI<@0cb*knG&4$pBFU~xg|L+;M
+z-}L?BYIgJUYIb`&zgzuuee=V`<@HZ#Rb>A-`Jd~jf2A6zih=Mf<EhrL%}|TCn!tDA
+z`GW}@G;>VW#9(~xOcVSx-{|~lRoj&q0zlGc7qiA1<tpS11OQfA!&JP55ft=GnAjSC
+ze9+K3O%@Q7?xW?6U{dCqYv=$&JV`!*iQ@za{yW$4dh`K(!qQ|i!CU!{r|iT0j;6iv
+zXrE#25{TW4G9u+u+435L<!2kuqz<I|&AYf&Ob&;%z0u*zq1oYk-n=(FSoov;Qv<qo
+zVVe6bAN_&`|KGWWhkQP{Y$0ib3;p05V3300j_K>+6mtZ8-+!VI<ZJ%`Yz#j)#GoXq
+z<1judiSM3=Zg;QbHr}@<!2<=x?P9QJvbZxao%XM=E9r%aU9TV@GN)lM^=L;PRq@Fd
+zKpp!Iii7Jx!Gvl%$?hqI)yw4Id;Wa6W4;Dw^xetSY}?Syib>KjB~-i@-keoQs4?j}
+zW>V1>^8ls%Kk*nS@O>i>Q}oVMTtsS<#xxup51lk|7^^X-I=v^>q=j47L6@2)t?>2v
+z4nKf>2mV%_toOY8+Mk}6lDet-8|1e`Ul)1{BlzR2#o>S%xIZK7BIu5#@`aUvKRnnw
+b<c779vfmvWGJza({~IqyF?|ll*EIPrz^zW`
+
+literal 46
+ucmezWPnki1A&nuEA&(&uh?9Y=M1~v&U4{~dA|NZ7AsZ~0&cMsS#Q*>bRSA6n
+
+diff --git a/backend/.dockerignore b/backend/.dockerignore
+new file mode 100644
+index 0000000000000000000000000000000000000000..da0aba376e515f4ef9ac6072ca26dcab8577f054
+--- /dev/null
++++ b/backend/.dockerignore
+@@ -0,0 +1,8 @@
++__pycache__
++*.pyc
++*.pyo
++*.pyd
++.env
++venv
++.venv
++app.db
+diff --git a/backend/Dockerfile b/backend/Dockerfile
+new file mode 100644
+index 0000000000000000000000000000000000000000..243c6cf392bf03e390095b4fe7bcf455e1291b25
+--- /dev/null
++++ b/backend/Dockerfile
+@@ -0,0 +1,17 @@
++FROM python:3.11-slim
++
++ENV PYTHONDONTWRITEBYTECODE=1 \
++    PYTHONUNBUFFERED=1
++
++WORKDIR /app
++
++RUN apt-get update && apt-get install -y build-essential && rm -rf /var/lib/apt/lists/*
++
++COPY requirements.txt .
++RUN pip install --no-cache-dir -r requirements.txt
++
++COPY app ./app
++
++EXPOSE 8000
++
++CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+diff --git a/backend/app/__init__.py b/backend/app/__init__.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/backend/app/crud.py b/backend/app/crud.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..b6ad19a2deb63fb7f0cbc290b3ec8148b3311179
+--- /dev/null
++++ b/backend/app/crud.py
+@@ -0,0 +1,112 @@
++from __future__ import annotations
++
++from datetime import date
++from typing import Iterable, List, Optional, Sequence
++
++from sqlalchemy import func, select
++from sqlalchemy.orm import Session
++
++from . import models, schemas
++
++
++def get_or_create_category(session: Session, name: str, type_: str = "expense", *, ai_suggested: bool = False) -> models.Category:
++    category = session.execute(
++        select(models.Category).where(func.lower(models.Category.name) == name.lower())
++    ).scalar_one_or_none()
++    if category:
++        if ai_suggested and not category.ai_suggested:
++            category.ai_suggested = True
++        return category
++
++    category = models.Category(name=name, type=type_, ai_suggested=ai_suggested)
++    session.add(category)
++    session.flush()
++    return category
++
++
++def create_transaction(session: Session, transaction: schemas.TransactionCreate) -> models.Transaction:
++    db_transaction = models.Transaction(**transaction.dict())
++    session.add(db_transaction)
++    session.commit()
++    session.refresh(db_transaction)
++    return db_transaction
++
++
++def bulk_create_transactions(session: Session, transactions: Iterable[schemas.TransactionCreate]) -> List[models.Transaction]:
++    db_transactions = [models.Transaction(**t.dict()) for t in transactions]
++    session.add_all(db_transactions)
++    session.commit()
++    for t in db_transactions:
++        session.refresh(t)
++    return db_transactions
++
++
++def list_transactions(
++    session: Session,
++    *,
++    start_date: Optional[date] = None,
++    end_date: Optional[date] = None,
++    category_id: Optional[int] = None,
++    limit: int = 500,
++) -> Sequence[models.Transaction]:
++    stmt = select(models.Transaction).order_by(models.Transaction.date.desc())
++    if start_date:
++        stmt = stmt.where(models.Transaction.date >= start_date)
++    if end_date:
++        stmt = stmt.where(models.Transaction.date <= end_date)
++    if category_id:
++        stmt = stmt.where(models.Transaction.category_id == category_id)
++    stmt = stmt.limit(limit)
++    return session.execute(stmt).scalars().all()
++
++
++def list_categories(session: Session) -> Sequence[models.Category]:
++    return session.execute(select(models.Category).order_by(models.Category.name.asc())).scalars().all()
++
++
++def create_category(session: Session, data: schemas.CategoryCreate) -> models.Category:
++    category = models.Category(**data.dict())
++    session.add(category)
++    session.commit()
++    session.refresh(category)
++    return category
++
++
++def upsert_budget(
++    session: Session, *, category_id: int, amount: float, period: str = "monthly", ai_generated: bool = False
++) -> models.Budget:
++    budget = (
++        session.execute(
++            select(models.Budget).where(
++                models.Budget.category_id == category_id,
++                models.Budget.period == period,
++            )
++        ).scalar_one_or_none()
++    )
++
++    if budget:
++        budget.amount = amount
++        budget.ai_generated = ai_generated
++    else:
++        budget = models.Budget(
++            category_id=category_id,
++            amount=amount,
++            period=period,
++            ai_generated=ai_generated,
++        )
++        session.add(budget)
++
++    session.commit()
++    session.refresh(budget)
++    return budget
++
++
++def list_budgets(session: Session, *, period: Optional[str] = None) -> Sequence[models.Budget]:
++    stmt = select(models.Budget).order_by(models.Budget.amount.desc())
++    if period:
++        stmt = stmt.where(models.Budget.period == period)
++    return session.execute(stmt).scalars().all()
++
++
++def uncategorized_transactions(session: Session) -> Sequence[models.Transaction]:
++    return session.execute(select(models.Transaction).where(models.Transaction.category_id.is_(None))).scalars().all()
+diff --git a/backend/app/database.py b/backend/app/database.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..39034065d99258a7d487f4ae5a43e4302f070ffe
+--- /dev/null
++++ b/backend/app/database.py
+@@ -0,0 +1,27 @@
++from __future__ import annotations
++
++from contextlib import contextmanager
++from typing import Generator
++
++from sqlalchemy import create_engine
++from sqlalchemy.orm import declarative_base, sessionmaker
++
++DATABASE_URL = "sqlite:///./app.db"
++
++engine = create_engine(
++    DATABASE_URL,
++    connect_args={"check_same_thread": False},
++    pool_pre_ping=True,
++)
++SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
++
++Base = declarative_base()
++
++
++@contextmanager
++def get_session() -> Generator:
++    session = SessionLocal()
++    try:
++        yield session
++    finally:
++        session.close()
+diff --git a/backend/app/main.py b/backend/app/main.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..e8c74aea971d4be4312e9901b35a577f55f25e30
+--- /dev/null
++++ b/backend/app/main.py
+@@ -0,0 +1,30 @@
++from __future__ import annotations
++
++from fastapi import FastAPI
++from fastapi.middleware.cors import CORSMiddleware
++
++from . import models
++from .database import Base, engine
++from .routers import budgets, categories, insights, transactions
++
++Base.metadata.create_all(bind=engine)
++
++app = FastAPI(title="Financial Tracking API", version="1.0.0")
++
++app.add_middleware(
++    CORSMiddleware,
++    allow_origins=["*"],
++    allow_credentials=True,
++    allow_methods=["*"],
++    allow_headers=["*"],
++)
++
++app.include_router(categories.router)
++app.include_router(transactions.router)
++app.include_router(budgets.router)
++app.include_router(insights.router)
++
++
++@app.get("/")
++def read_root():
++    return {"status": "ok"}
+diff --git a/backend/app/models.py b/backend/app/models.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..ffd8e6d9f8324a98adc7b68e13a960b4e1bca0ee
+--- /dev/null
++++ b/backend/app/models.py
+@@ -0,0 +1,55 @@
++from __future__ import annotations
++
++from datetime import date, datetime
++from typing import Optional
++
++from sqlalchemy import Boolean, Column, Date, DateTime, Float, ForeignKey, Integer, String, Text
++from sqlalchemy.dialects.sqlite import JSON
++from sqlalchemy.orm import relationship
++
++from .database import Base
++
++
++class TimestampMixin:
++    created_at = Column(DateTime, default=datetime.utcnow)
++    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
++
++
++class Category(Base, TimestampMixin):
++    __tablename__ = "categories"
++
++    id = Column(Integer, primary_key=True, index=True)
++    name = Column(String(255), unique=True, nullable=False)
++    type = Column(String(50), default="expense")
++    ai_suggested = Column(Boolean, default=False)
++
++    transactions = relationship("Transaction", back_populates="category")
++    budgets = relationship("Budget", back_populates="category")
++
++
++class Transaction(Base, TimestampMixin):
++    __tablename__ = "transactions"
++
++    id = Column(Integer, primary_key=True, index=True)
++    date = Column(Date, default=date.today, index=True)
++    description = Column(String(512), nullable=False)
++    amount = Column(Float, nullable=False)
++    category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
++    account_name = Column(String(255), nullable=True)
++    source = Column(String(255), nullable=True)
++    notes = Column(Text, nullable=True)
++    metadata = Column(JSON, nullable=True)
++
++    category = relationship("Category", back_populates="transactions")
++
++
++class Budget(Base, TimestampMixin):
++    __tablename__ = "budgets"
++
++    id = Column(Integer, primary_key=True, index=True)
++    category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
++    amount = Column(Float, nullable=False)
++    period = Column(String(50), default="monthly")
++    ai_generated = Column(Boolean, default=False)
++
++    category = relationship("Category", back_populates="budgets")
+diff --git a/backend/app/routers/__init__.py b/backend/app/routers/__init__.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/backend/app/routers/budgets.py b/backend/app/routers/budgets.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..9a4e938a74f3078829647ace9d567b9d73c34fc4
+--- /dev/null
++++ b/backend/app/routers/budgets.py
+@@ -0,0 +1,40 @@
++from __future__ import annotations
++
++from typing import List, Optional
++
++from fastapi import APIRouter, Depends
++from sqlalchemy.orm import Session
++
++from .. import crud, schemas
++from ..database import get_session
++from ..services import ai
++
++router = APIRouter(prefix="/budgets", tags=["budgets"])
++
++
++def get_db():
++    with get_session() as session:
++        yield session
++
++
++@router.get("", response_model=List[schemas.BudgetRead])
++def list_budgets(*, session: Session = Depends(get_db), period: Optional[str] = None):
++    return crud.list_budgets(session, period=period)
++
++
++@router.post("/auto", response_model=List[schemas.BudgetRead])
++def auto_generate_budgets(*, session: Session = Depends(get_db)):
++    transactions = crud.list_transactions(session, limit=1000)
++    recommendations = ai.generate_budget_recommendations(session, transactions)
++    budgets = []
++    for recommendation in recommendations:
++        category = crud.get_or_create_category(session, recommendation["category"], ai_suggested=True)
++        budget = crud.upsert_budget(
++            session,
++            category_id=category.id,
++            amount=recommendation["suggested_amount"],
++            period="monthly",
++            ai_generated=True,
++        )
++        budgets.append(budget)
++    return budgets
+diff --git a/backend/app/routers/categories.py b/backend/app/routers/categories.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..df561b8a24d60b57cad21602ffd29b49c9fbaf61
+--- /dev/null
++++ b/backend/app/routers/categories.py
+@@ -0,0 +1,26 @@
++from __future__ import annotations
++
++from typing import List
++
++from fastapi import APIRouter, Depends
++from sqlalchemy.orm import Session
++
++from .. import crud, schemas
++from ..database import get_session
++
++router = APIRouter(prefix="/categories", tags=["categories"])
++
++
++def get_db():
++    with get_session() as session:
++        yield session
++
++
++@router.get("", response_model=List[schemas.CategoryRead])
++def list_categories(*, session: Session = Depends(get_db)):
++    return crud.list_categories(session)
++
++
++@router.post("", response_model=schemas.CategoryRead)
++def create_category(*, session: Session = Depends(get_db), category: schemas.CategoryCreate):
++    return crud.create_category(session, category)
+diff --git a/backend/app/routers/insights.py b/backend/app/routers/insights.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..d18f050b66ee07ea66f3239cc16cf6367af262c6
+--- /dev/null
++++ b/backend/app/routers/insights.py
+@@ -0,0 +1,24 @@
++from __future__ import annotations
++
++from typing import List
++
++from fastapi import APIRouter, Depends
++from sqlalchemy.orm import Session
++
++from .. import crud, schemas
++from ..database import get_session
++from ..services import ai
++
++router = APIRouter(prefix="/insights", tags=["insights"])
++
++
++def get_db():
++    with get_session() as session:
++        yield session
++
++
++@router.get("", response_model=List[schemas.InsightResponse])
++def get_insights(*, session: Session = Depends(get_db)):
++    transactions = crud.list_transactions(session, limit=500)
++    insights = ai.generate_insights(transactions)
++    return [schemas.InsightResponse(**insight) for insight in insights]
+diff --git a/backend/app/routers/transactions.py b/backend/app/routers/transactions.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..74a805d7c3d79640ca9d4b05cd8eb81432b27669
+--- /dev/null
++++ b/backend/app/routers/transactions.py
+@@ -0,0 +1,126 @@
++from __future__ import annotations
++
++from datetime import date
++from typing import List, Optional
++
++from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
++from sqlalchemy.orm import Session
++
++from .. import crud, models, schemas
++from ..database import SessionLocal, get_session
++from ..services import ai, categorization, importers
++
++router = APIRouter(prefix="/transactions", tags=["transactions"])
++
++
++def get_db():
++    with get_session() as session:
++        yield session
++
++
++@router.get("", response_model=List[schemas.TransactionRead])
++def list_transactions(
++    *,
++    session: Session = Depends(get_db),
++    start_date: Optional[date] = None,
++    end_date: Optional[date] = None,
++    category_id: Optional[int] = None,
++    limit: int = 500,
++):
++    transactions = crud.list_transactions(
++        session,
++        start_date=start_date,
++        end_date=end_date,
++        category_id=category_id,
++        limit=limit,
++    )
++    return transactions
++
++
++@router.post("", response_model=schemas.TransactionRead)
++def create_transaction(*, session: Session = Depends(get_db), transaction: schemas.TransactionCreate):
++    return crud.create_transaction(session, transaction)
++
++
++@router.post("/import/csv", response_model=schemas.ImportResponse)
++async def import_csv(
++    *,
++    session: Session = Depends(get_db),
++    file: UploadFile = File(...),
++    source: Optional[str] = None,
++):
++    content = (await file.read()).decode("utf-8")
++    try:
++        transactions = importers.extract_transactions(content, default_source=source or file.filename)
++    except ValueError as exc:
++        raise HTTPException(status_code=400, detail=str(exc)) from exc
++
++    created = crud.bulk_create_transactions(session, transactions)
++
++    categorized = 0
++    for transaction in created:
++        category_hint = transaction.metadata.get("category_hint") if transaction.metadata else None
++        if category_hint:
++            category = crud.get_or_create_category(session, category_hint, ai_suggested=True)
++            transaction.category_id = category.id
++            categorized += 1
++    session.commit()
++
++    return schemas.ImportResponse(imported=len(created), skipped=0, warnings=[])
++
++
++@router.post("/import/plaid", response_model=schemas.ImportResponse)
++def import_plaid(
++    *,
++    session: Session = Depends(get_db),
++    access_token: str,
++    start_date: date,
++    end_date: date,
++):
++    from ..services import plaid
++
++    try:
++        transactions = plaid.fetch_transactions(
++            access_token=access_token,
++            start_date=start_date,
++            end_date=end_date,
++        )
++    except RuntimeError as exc:
++        raise HTTPException(status_code=400, detail=str(exc)) from exc
++
++    new_transactions = []
++    for txn in transactions:
++        amount = float(txn.get("amount", 0)) * -1  # Plaid uses positive for expenses
++        metadata = {"plaid": txn}
++        new_transactions.append(
++            schemas.TransactionCreate(
++                date=txn.get("date"),
++                description=txn.get("name", "Plaid transaction"),
++                amount=amount,
++                account_name=txn.get("account_id"),
++                source="plaid",
++                metadata=metadata,
++            )
++        )
++
++    crud.bulk_create_transactions(session, new_transactions)
++    return schemas.ImportResponse(imported=len(new_transactions), skipped=0, warnings=[])
++
++
++@router.post("/auto-categorize", response_model=schemas.AutoCategorizeResponse)
++def auto_categorize(*, session: Session = Depends(get_db)):
++    uncategorized = crud.uncategorized_transactions(session)
++    updated = 0
++    ai_used = 0
++    for transaction in uncategorized:
++        category = categorization.categorize_transaction(session, transaction)
++        if not category:
++            suggestion = ai.suggest_category_with_ai(transaction.description, transaction.amount)
++            if suggestion:
++                category = crud.get_or_create_category(session, suggestion, ai_suggested=True)
++                ai_used += 1
++        if category:
++            transaction.category_id = category.id
++            updated += 1
++    session.commit()
++    return schemas.AutoCategorizeResponse(updated=updated, uncategorized=len(uncategorized) - updated)
+diff --git a/backend/app/schemas.py b/backend/app/schemas.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..142cb8dd5e3bd15c89f3b3e9062b05e980a9f69c
+--- /dev/null
++++ b/backend/app/schemas.py
+@@ -0,0 +1,93 @@
++from __future__ import annotations
++
++from datetime import date, datetime
++from typing import Any, List, Optional
++
++from pydantic import BaseModel, Field
++
++
++class CategoryBase(BaseModel):
++    name: str
++    type: str = Field(default="expense", regex="^(income|expense)$")
++
++
++class CategoryCreate(CategoryBase):
++    pass
++
++
++class CategoryRead(CategoryBase):
++    id: int
++    ai_suggested: bool = False
++    created_at: datetime
++    updated_at: datetime
++
++    class Config:
++        orm_mode = True
++
++
++class TransactionBase(BaseModel):
++    date: date
++    description: str
++    amount: float
++    account_name: Optional[str] = None
++    source: Optional[str] = None
++    notes: Optional[str] = None
++    metadata: Optional[dict[str, Any]] = None
++
++
++class TransactionCreate(TransactionBase):
++    category_id: Optional[int] = None
++
++
++class TransactionRead(TransactionBase):
++    id: int
++    category: Optional[CategoryRead] = None
++    created_at: datetime
++    updated_at: datetime
++
++    class Config:
++        orm_mode = True
++
++
++class BudgetBase(BaseModel):
++    category_id: int
++    amount: float
++    period: str = Field(default="monthly")
++
++
++class BudgetCreate(BudgetBase):
++    ai_generated: bool = False
++
++
++class BudgetRead(BudgetBase):
++    id: int
++    ai_generated: bool
++    category: CategoryRead
++    created_at: datetime
++    updated_at: datetime
++
++    class Config:
++        orm_mode = True
++
++
++class ImportResponse(BaseModel):
++    imported: int
++    skipped: int
++    warnings: List[str] = []
++
++
++class AutoCategorizeResponse(BaseModel):
++    updated: int
++    uncategorized: int
++
++
++class InsightResponse(BaseModel):
++    title: str
++    detail: str
++    action: Optional[str] = None
++
++
++class BudgetRecommendation(BaseModel):
++    category: str
++    suggested_amount: float
++    rationale: str
+diff --git a/backend/app/services/__init__.py b/backend/app/services/__init__.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/backend/app/services/ai.py b/backend/app/services/ai.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..6fc45e6f7821dc8f4631076943d181f7427bdf53
+--- /dev/null
++++ b/backend/app/services/ai.py
+@@ -0,0 +1,147 @@
++from __future__ import annotations
++
++import json
++import os
++from statistics import mean
++from typing import Iterable, List, Optional
++
++try:
++    from openai import OpenAI
++except Exception:  # pragma: no cover - optional dependency
++    OpenAI = None  # type: ignore
++
++from sqlalchemy.orm import Session
++
++from .. import crud, models
++
++
++def _client() -> Optional[OpenAI]:  # type: ignore[valid-type]
++    api_key = os.getenv("OPENAI_API_KEY")
++    if not api_key or OpenAI is None:
++        return None
++    return OpenAI(api_key=api_key)
++
++
++def suggest_category_with_ai(description: str, amount: float) -> Optional[str]:
++    client = _client()
++    if not client:
++        return None
++
++    prompt = (
++        "You categorize personal finance transactions. Given the description and amount, "
++        "suggest an appropriate spending category such as Groceries, Dining Out, Utilities, "
++        "Transportation, Entertainment, Housing, Healthcare, Insurance, Salary, or Transfer. "
++        "Return only the category name."
++    )
++
++    completion = client.responses.create(
++        model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
++        input=[
++            {
++                "role": "system",
++                "content": prompt,
++            },
++            {
++                "role": "user",
++                "content": json.dumps({"description": description, "amount": amount}),
++            },
++        ],
++    )
++
++    try:
++        return completion.output[0].content[0].text.strip()
++    except Exception:
++        return None
++
++
++def generate_budget_recommendations(session: Session, transactions: Iterable[models.Transaction]) -> List[dict]:
++    client = _client()
++    category_totals = {}
++    category_counts = {}
++    for transaction in transactions:
++        if not transaction.category:
++            continue
++        name = transaction.category.name
++        category_totals.setdefault(name, 0.0)
++        category_counts.setdefault(name, 0)
++        category_totals[name] += transaction.amount
++        category_counts[name] += 1
++
++    summaries = [
++        {
++            "category": category,
++            "average": category_totals[category] / max(category_counts[category], 1),
++            "spend": category_totals[category],
++        }
++        for category in category_totals
++    ]
++
++    if client:
++        prompt = (
++            "You are a financial coach. Suggest a monthly budget amount for each category based on recent spending. "
++            "Respond with JSON list where each item has category, suggested_amount, rationale."
++        )
++        completion = client.responses.create(
++            model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
++            input=[
++                {"role": "system", "content": prompt},
++                {"role": "user", "content": json.dumps(summaries)},
++            ],
++        )
++        try:
++            message = completion.output[0].content[0].text
++            data = json.loads(message)
++            if isinstance(data, list):
++                return data
++        except Exception:
++            pass
++
++    # fallback heuristic if AI unavailable
++    recommendations: List[dict] = []
++    for summary in summaries:
++        avg = summary["average"]
++        suggested = round(avg * 0.9, 2) if avg > 0 else 0.0
++        recommendations.append(
++            {
++                "category": summary["category"],
++                "suggested_amount": suggested,
++                "rationale": "Suggested at 90% of recent average spend to encourage savings.",
++            }
++        )
++    return recommendations
++
++
++def generate_insights(transactions: Iterable[models.Transaction]) -> List[dict]:
++    insights: List[dict] = []
++    expenses = [t.amount for t in transactions if t.amount < 0]
++    income = [t.amount for t in transactions if t.amount > 0]
++
++    if expenses:
++        avg_expense = mean(abs(e) for e in expenses)
++        insights.append(
++            {
++                "title": "Average expense",
++                "detail": f"Typical purchase is ${avg_expense:,.2f}.",
++            }
++        )
++
++    if income:
++        total_income = sum(income)
++        insights.append(
++            {
++                "title": "Income snapshot",
++                "detail": f"Income recorded totals ${total_income:,.2f}.",
++            }
++        )
++
++    if expenses and income:
++        burn = sum(expenses) + sum(income)
++        insights.append(
++            {
++                "title": "Net cash flow",
++                "detail": f"Net cash flow over the selected period is ${burn:,.2f}.",
++                "action": "Consider adjusting budgets for negative cash flow.",
++            }
++        )
++
++    return insights
+diff --git a/backend/app/services/categorization.py b/backend/app/services/categorization.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..ea8acf1b9c83ed262d38d23fbbf5dca8f0c7a7e3
+--- /dev/null
++++ b/backend/app/services/categorization.py
+@@ -0,0 +1,70 @@
++from __future__ import annotations
++
++from collections import defaultdict
++from dataclasses import dataclass
++from typing import Dict, Iterable, List, Optional
++
++from sqlalchemy.orm import Session
++
++from .. import crud, models
++
++
++@dataclass
++class CategorizationResult:
++    transaction: models.Transaction
++    category: Optional[models.Category]
++
++
++KEYWORD_CATEGORIES: Dict[str, str] = {
++    "grocery": "Groceries",
++    "supermarket": "Groceries",
++    "whole foods": "Groceries",
++    "trader joe": "Groceries",
++    "salary": "Salary",
++    "payroll": "Salary",
++    "uber": "Transportation",
++    "lyft": "Transportation",
++    "shell": "Fuel",
++    "exxon": "Fuel",
++    "rent": "Housing",
++    "mortgage": "Housing",
++    "netflix": "Entertainment",
++    "hulu": "Entertainment",
++    "spotify": "Entertainment",
++    "prime": "Entertainment",
++    "insurance": "Insurance",
++    "medical": "Healthcare",
++    "pharmacy": "Healthcare",
++    "restaurant": "Dining Out",
++    "cafe": "Dining Out",
++    "starbucks": "Dining Out",
++    "deposit": "Income",
++    "transfer": "Transfer",
++}
++
++
++def categorize_transaction(session: Session, transaction: models.Transaction) -> Optional[models.Category]:
++    description = transaction.description.lower()
++    matches: Dict[str, int] = defaultdict(int)
++    for keyword, category_name in KEYWORD_CATEGORIES.items():
++        if keyword in description:
++            matches[category_name] += 1
++
++    if not matches:
++        return None
++
++    best_category_name = max(matches, key=matches.get)
++    return crud.get_or_create_category(session, best_category_name, ai_suggested=True)
++
++
++def categorize_transactions(session: Session, transactions: Iterable[models.Transaction]) -> List[CategorizationResult]:
++    results: List[CategorizationResult] = []
++    for transaction in transactions:
++        if transaction.category_id is not None:
++            continue
++        category = categorize_transaction(session, transaction)
++        if category:
++            transaction.category_id = category.id
++        results.append(CategorizationResult(transaction=transaction, category=category))
++    session.commit()
++    return results
+diff --git a/backend/app/services/importers.py b/backend/app/services/importers.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..4d1210d5ef3bb2e8ceabc4b43c193465a8ba614a
+--- /dev/null
++++ b/backend/app/services/importers.py
+@@ -0,0 +1,84 @@
++from __future__ import annotations
++
++import csv
++from datetime import datetime
++from io import StringIO
++from typing import Iterable, List, Tuple
++
++from .. import schemas
++
++COMMON_DATE_FORMATS = ["%Y-%m-%d", "%m/%d/%Y", "%d/%m/%Y"]
++
++
++def parse_date(value: str) -> datetime.date:
++    for fmt in COMMON_DATE_FORMATS:
++        try:
++            return datetime.strptime(value.strip(), fmt).date()
++        except ValueError:
++            continue
++    raise ValueError(f"Unable to parse date: {value}")
++
++
++def normalize_amount(value: str) -> float:
++    value = value.replace(",", "").replace("$", "").strip()
++    if value.startswith("(") and value.endswith(")"):
++        value = f"-{value[1:-1]}"
++    return float(value)
++
++
++HEADER_MAPPINGS = {
++    "date": {"date", "transaction date", "posted date", "trans date"},
++    "description": {"description", "name", "memo", "details"},
++    "amount": {"amount", "transaction amount", "value"},
++    "category": {"category", "type", "spending category"},
++    "account": {"account", "account name", "card"},
++}
++
++
++def identify_column(header: str) -> Tuple[str, str] | None:
++    normalized = header.strip().lower()
++    for key, options in HEADER_MAPPINGS.items():
++        if normalized in options:
++            return key, header
++    return None
++
++
++def extract_transactions(csv_content: str, *, default_source: str | None = None) -> List[schemas.TransactionCreate]:
++    reader = csv.DictReader(StringIO(csv_content))
++    column_map = {}
++    for field in reader.fieldnames or []:
++        match = identify_column(field)
++        if match:
++            column_map[match[0]] = field
++
++    required = {"date", "description", "amount"}
++    if not required.issubset(column_map):
++        missing = required - set(column_map)
++        raise ValueError(f"Missing required columns: {', '.join(missing)}")
++
++    transactions: List[schemas.TransactionCreate] = []
++    for row in reader:
++        try:
++            date = parse_date(row[column_map["date"]])
++            description = row[column_map["description"]].strip()
++            amount = normalize_amount(row[column_map["amount"]])
++            category_name = row.get(column_map.get("category", ""), "").strip()
++            account_name = row.get(column_map.get("account", ""), "").strip() or None
++        except Exception as exc:
++            raise ValueError(f"Error processing row {row}: {exc}") from exc
++
++        metadata = {"source_row": row}
++        transaction = schemas.TransactionCreate(
++            date=date,
++            description=description,
++            amount=amount,
++            account_name=account_name,
++            source=default_source,
++            metadata=metadata,
++        )
++        if category_name:
++            transaction.category_id = None
++            transaction.metadata["category_hint"] = category_name
++        transactions.append(transaction)
++
++    return transactions
+diff --git a/backend/app/services/plaid.py b/backend/app/services/plaid.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..9ad75723f212a92c529c706be249958500b1428a
+--- /dev/null
++++ b/backend/app/services/plaid.py
+@@ -0,0 +1,44 @@
++from __future__ import annotations
++
++import os
++from datetime import date
++from typing import List, Optional
++
++try:
++    from plaid import Client
++    from plaid.model.transactions_get_request import TransactionsGetRequest
++    from plaid.model.transactions_get_request_options import TransactionsGetRequestOptions
++except Exception:  # pragma: no cover - plaid is optional
++    Client = None  # type: ignore
++
++
++def _client() -> Optional[Client]:  # type: ignore[valid-type]
++    if Client is None:
++        return None
++    client_id = os.getenv("PLAID_CLIENT_ID")
++    secret = os.getenv("PLAID_SECRET")
++    environment = os.getenv("PLAID_ENV", "sandbox")
++    if not client_id or not secret:
++        return None
++    return Client(client_id=client_id, secret=secret, environment=environment)
++
++
++def fetch_transactions(
++    *,
++    access_token: str,
++    start_date: date,
++    end_date: date,
++    count: int = 250,
++) -> List[dict]:
++    client = _client()
++    if not client:
++        raise RuntimeError("Plaid client not configured. Set PLAID_CLIENT_ID and PLAID_SECRET.")
++
++    request = TransactionsGetRequest(
++        access_token=access_token,
++        start_date=start_date,
++        end_date=end_date,
++        options=TransactionsGetRequestOptions(count=count),
++    )
++    response = client.transactions_get(request)
++    return [txn.to_dict() for txn in response["transactions"]]
+diff --git a/backend/requirements.txt b/backend/requirements.txt
+new file mode 100644
+index 0000000000000000000000000000000000000000..e3d65dbf8d4e58ad6faefe040fd5cc42b88cad99
+--- /dev/null
++++ b/backend/requirements.txt
+@@ -0,0 +1,7 @@
++fastapi==0.111.0
++uvicorn[standard]==0.29.0
++sqlalchemy==2.0.30
++pydantic==1.10.15
++python-multipart==0.0.9
++openai==1.30.1
++plaid-python==16.0.0
+diff --git a/docker-compose.yml b/docker-compose.yml
+new file mode 100644
+index 0000000000000000000000000000000000000000..c652703199b7472263ff9b676dd00a489cb2f501
+--- /dev/null
++++ b/docker-compose.yml
+@@ -0,0 +1,24 @@
++version: '3.9'
++services:
++  backend:
++    build: ./backend
++    environment:
++      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
++      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o-mini}
++      - PLAID_CLIENT_ID=${PLAID_CLIENT_ID:-}
++      - PLAID_SECRET=${PLAID_SECRET:-}
++      - PLAID_ENV=${PLAID_ENV:-sandbox}
++    volumes:
++      - backend_data:/app
++    ports:
++      - '8000:8000'
++  frontend:
++    build: ./frontend
++    depends_on:
++      - backend
++    environment:
++      - VITE_API_URL=http://backend:8000
++    ports:
++      - '4173:4173'
++volumes:
++  backend_data:
+diff --git a/docs/BINARY_ASSET_WORKFLOW.md b/docs/BINARY_ASSET_WORKFLOW.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..050903fff0088c4c8936cf6df1ffac43d7c0f313
+--- /dev/null
++++ b/docs/BINARY_ASSET_WORKFLOW.md
+@@ -0,0 +1,75 @@
++# Binary Asset Workflow
++
++Some corporate Git hosts block commits that contain generated or binary artifacts. This project keeps the repository source-only and
++rebuilds any binaries locally. Follow the steps below whenever you need the compiled assets.
++
++## Frontend build artifacts
++
++1. Install dependencies (requires Node 18+):
++   ```bash
++   cd frontend
++   npm install
++   ```
++2. Create a production bundle:
++   ```bash
++   npm run build
++   ```
++3. The generated assets are written to `frontend/dist/`. These files are ignored by Git. Deployments copy this folder into the
++   frontend container image during `docker-compose build`. If your Git provider blocks binary pushes, run the build locally and
++   include the build step in your CI/CD pipeline instead of committing the `dist` directory.
++
++## Backend compiled bytecode
++
++Python `.pyc` bytecode files and SQLite databases are created at runtime and excluded from the repository via `.gitignore`.
++To recreate them locally:
++
++```bash
++cd backend
++python -m venv .venv
++source .venv/bin/activate
++pip install -r requirements.txt
++python -m compileall app
++```
++
++This produces the same bytecode artifacts that appear when the backend container runs. Do **not** commit the resulting `__pycache__`
++directories or the SQLite database file; they are generated automatically when the service starts.
++
++## Docker images
++
++Docker images are binary blobs and cannot be pushed to Git. Build them locally or in your CI environment using:
++
++```bash
++docker-compose build
++```
++
++The `Dockerfile`s copy only source code and install dependencies so the resulting image is reproducible without storing binaries in
++Git.
++
++## Sample data files
++
++If you need example transactions for testing, generate them from the provided template instead of committing exported spreadsheets.
++Run:
++
++```bash
++python scripts/generate_sample_transactions.py
++```
++
++This script writes CSV files under `samples/` (ignored by Git). You can adjust the generator to mirror your data without uploading
++proprietary bank exports.
++
++## CI/CD tip
++
++Configure your CI pipeline to run the commands above as build steps. That way, reviewers can clone the repo, execute the documented
++scripts, and produce the same binaries locally—no binary commits required.
++
++## Check for binary files before committing
++
++Run the helper script below to verify that staged files decode as UTF-8 text and
++to catch stray binary artifacts before opening a pull request:
++
++```bash
++python scripts/check_no_binaries.py
++```
++
++The script returns a non-zero exit code and prints the offending paths if it
++detects binary-like content, helping you keep pull requests source-only.
+diff --git a/env.example b/env.example
+new file mode 100644
+index 0000000000000000000000000000000000000000..dea56d60a89b8db94563c1fde632aedbb52cb9c6
+--- /dev/null
++++ b/env.example
+@@ -0,0 +1,8 @@
++# Backend AI configuration
++OPENAI_API_KEY=
++OPENAI_MODEL=gpt-4o-mini
++
++# Plaid configuration
++PLAID_CLIENT_ID=
++PLAID_SECRET=
++PLAID_ENV=sandbox
+diff --git a/frontend/.dockerignore b/frontend/.dockerignore
+new file mode 100644
+index 0000000000000000000000000000000000000000..a36e69a4ea967b4ec2d4110f9e341fd00d9876e4
+--- /dev/null
++++ b/frontend/.dockerignore
+@@ -0,0 +1,4 @@
++node_modules
++npm-debug.log
++dist
++.DS_Store
+diff --git a/frontend/Dockerfile b/frontend/Dockerfile
+new file mode 100644
+index 0000000000000000000000000000000000000000..26e3f2088685263bb15fa18f952adab4d87d1eaa
+--- /dev/null
++++ b/frontend/Dockerfile
+@@ -0,0 +1,16 @@
++FROM node:18-alpine
++
++WORKDIR /usr/src/app
++
++COPY package*.json ./
++RUN npm install
++
++COPY . .
++
++RUN npm run build
++
++RUN npm install -g serve
++
++EXPOSE 4173
++
++CMD ["serve", "-s", "dist", "-l", "4173"]
+diff --git a/frontend/index.html b/frontend/index.html
+new file mode 100644
+index 0000000000000000000000000000000000000000..65ec8925824eb159b460b020fb51570922a5429b
+--- /dev/null
++++ b/frontend/index.html
+@@ -0,0 +1,12 @@
++<!doctype html>
++<html lang="en">
++  <head>
++    <meta charset="UTF-8" />
++    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++    <title>Financial Tracking</title>
++  </head>
++  <body>
++    <div id="root"></div>
++    <script type="module" src="/src/main.jsx"></script>
++  </body>
++</html>
+diff --git a/frontend/package.json b/frontend/package.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..c8e3418708200c56b8bb73fcf3c6f959fe368d97
+--- /dev/null
++++ b/frontend/package.json
+@@ -0,0 +1,23 @@
++{
++  "name": "financial-tracking-frontend",
++  "version": "1.0.0",
++  "private": true,
++  "type": "module",
++  "scripts": {
++    "dev": "vite",
++    "build": "vite build",
++    "preview": "vite preview --host 0.0.0.0 --port 4173"
++  },
++  "dependencies": {
++    "@tanstack/react-query": "5.36.1",
++    "axios": "1.6.8",
++    "dayjs": "1.11.10",
++    "react": "18.2.0",
++    "react-dom": "18.2.0",
++    "react-router-dom": "6.23.1"
++  },
++  "devDependencies": {
++    "@vitejs/plugin-react": "4.3.0",
++    "vite": "5.2.9"
++  }
++}
+diff --git a/frontend/src/App.jsx b/frontend/src/App.jsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..5e5235dfa6f3ad489b2adb33add7024704a81835
+--- /dev/null
++++ b/frontend/src/App.jsx
+@@ -0,0 +1,24 @@
++import React from 'react';
++import { Routes, Route, Link } from 'react-router-dom';
++import DashboardPage from './components/DashboardPage.jsx';
++
++const App = () => {
++  return (
++    <div className="app-shell">
++      <header className="app-header">
++        <h1>Financial Tracking</h1>
++        <nav>
++          <Link to="/">Dashboard</Link>
++        </nav>
++      </header>
++      <main>
++        <Routes>
++          <Route path="/" element={<DashboardPage />} />
++        </Routes>
++      </main>
++      <footer className="app-footer">Built with FastAPI, React &amp; AI assistance.</footer>
++    </div>
++  );
++};
++
++export default App;
+diff --git a/frontend/src/components/BudgetList.jsx b/frontend/src/components/BudgetList.jsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..98679a16404f41bea69f4c68bc915a0c07f9afc7
+--- /dev/null
++++ b/frontend/src/components/BudgetList.jsx
+@@ -0,0 +1,26 @@
++import React from 'react';
++
++const BudgetList = ({ budgets }) => {
++  if (!budgets.length) {
++    return <p>No budgets configured yet. Try generating them with AI.</p>;
++  }
++
++  return (
++    <ul className="budget-list">
++      {budgets.map((budget) => (
++        <li key={budget.id}>
++          <div>
++            <strong>{budget.category?.name ?? 'Uncategorized'}</strong>
++            <span>{budget.period}</span>
++          </div>
++          <div>
++            <span>${budget.amount.toFixed(2)}</span>
++            {budget.ai_generated && <small>AI</small>}
++          </div>
++        </li>
++      ))}
++    </ul>
++  );
++};
++
++export default BudgetList;
+diff --git a/frontend/src/components/DashboardPage.jsx b/frontend/src/components/DashboardPage.jsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..81daf2a8df2c0cd45d138f2624fb8c792543ed64
+--- /dev/null
++++ b/frontend/src/components/DashboardPage.jsx
+@@ -0,0 +1,134 @@
++import React, { useMemo } from 'react';
++import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
++import axios from 'axios';
++import TransactionsTable from './TransactionsTable.jsx';
++import BudgetList from './BudgetList.jsx';
++import UploadTransactions from './UploadTransactions.jsx';
++import PlaidImport from './PlaidImport.jsx';
++import InsightsPanel from './InsightsPanel.jsx';
++
++const api = axios.create({
++  baseURL: '/api',
++});
++
++const DashboardPage = () => {
++  const queryClient = useQueryClient();
++
++  const { data: categories = [] } = useQuery({
++    queryKey: ['categories'],
++    queryFn: async () => (await api.get('/categories')).data,
++  });
++
++  const { data: transactions = [] } = useQuery({
++    queryKey: ['transactions'],
++    queryFn: async () => (await api.get('/transactions')).data,
++  });
++
++  const { data: budgets = [] } = useQuery({
++    queryKey: ['budgets'],
++    queryFn: async () => (await api.get('/budgets')).data,
++  });
++
++  const { data: insights = [] } = useQuery({
++    queryKey: ['insights'],
++    queryFn: async () => (await api.get('/insights')).data,
++  });
++
++  const autoCategorizeMutation = useMutation({
++    mutationFn: async () => (await api.post('/transactions/auto-categorize')).data,
++    onSuccess: () => {
++      queryClient.invalidateQueries({ queryKey: ['transactions'] });
++      queryClient.invalidateQueries({ queryKey: ['categories'] });
++    },
++  });
++
++  const autoBudgetMutation = useMutation({
++    mutationFn: async () => (await api.post('/budgets/auto')).data,
++    onSuccess: () => {
++      queryClient.invalidateQueries({ queryKey: ['budgets'] });
++    },
++  });
++
++  const totals = useMemo(() => {
++    const income = transactions
++      .filter((txn) => txn.amount > 0)
++      .reduce((acc, txn) => acc + txn.amount, 0);
++    const expenses = transactions
++      .filter((txn) => txn.amount < 0)
++      .reduce((acc, txn) => acc + txn.amount, 0);
++    return {
++      income,
++      expenses,
++      net: income + expenses,
++    };
++  }, [transactions]);
++
++  return (
++    <div className="dashboard">
++      <section className="grid stats">
++        <div className="card">
++          <h2>Income</h2>
++          <p>${totals.income.toFixed(2)}</p>
++        </div>
++        <div className="card">
++          <h2>Expenses</h2>
++          <p>${Math.abs(totals.expenses).toFixed(2)}</p>
++        </div>
++        <div className={`card ${totals.net >= 0 ? 'positive' : 'negative'}`}>
++          <h2>Net</h2>
++          <p>${totals.net.toFixed(2)}</p>
++        </div>
++        <div className="card">
++          <h2>Categories</h2>
++          <p>{categories.length}</p>
++        </div>
++      </section>
++
++      <section className="actions">
++        <UploadTransactions
++          onComplete={() => {
++            queryClient.invalidateQueries({ queryKey: ['transactions'] });
++            queryClient.invalidateQueries({ queryKey: ['categories'] });
++          }}
++        />
++        <PlaidImport
++          onComplete={() => queryClient.invalidateQueries({ queryKey: ['transactions'] })}
++        />
++        <div className="action-card">
++          <h3>AI Tools</h3>
++          <button onClick={() => autoCategorizeMutation.mutate()} disabled={autoCategorizeMutation.isLoading}>
++            {autoCategorizeMutation.isLoading ? 'Categorizing…' : 'Auto-categorize'}
++          </button>
++          <button onClick={() => autoBudgetMutation.mutate()} disabled={autoBudgetMutation.isLoading}>
++            {autoBudgetMutation.isLoading ? 'Generating…' : 'Auto budget'}
++          </button>
++          {autoCategorizeMutation.data && (
++            <p>
++              Updated {autoCategorizeMutation.data.updated} transactions.
++              {autoCategorizeMutation.data.uncategorized > 0 && (
++                <span> {autoCategorizeMutation.data.uncategorized} remaining uncategorized.</span>
++              )}
++            </p>
++          )}
++        </div>
++      </section>
++
++      <section className="grid main">
++        <div className="card wide">
++          <h2>Recent Transactions</h2>
++          <TransactionsTable transactions={transactions} />
++        </div>
++        <div className="card">
++          <h2>Budgets</h2>
++          <BudgetList budgets={budgets} />
++        </div>
++        <div className="card">
++          <h2>Insights</h2>
++          <InsightsPanel insights={insights} />
++        </div>
++      </section>
++    </div>
++  );
++};
++
++export default DashboardPage;
+diff --git a/frontend/src/components/InsightsPanel.jsx b/frontend/src/components/InsightsPanel.jsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..54d8f2bd2594afbb8988cd9544331be75955d12a
+--- /dev/null
++++ b/frontend/src/components/InsightsPanel.jsx
+@@ -0,0 +1,21 @@
++import React from 'react';
++
++const InsightsPanel = ({ insights }) => {
++  if (!insights.length) {
++    return <p>No insights yet. Import transactions to get AI-driven suggestions.</p>;
++  }
++
++  return (
++    <ul className="insights">
++      {insights.map((insight, index) => (
++        <li key={index}>
++          <h4>{insight.title}</h4>
++          <p>{insight.detail}</p>
++          {insight.action && <span>{insight.action}</span>}
++        </li>
++      ))}
++    </ul>
++  );
++};
++
++export default InsightsPanel;
+diff --git a/frontend/src/components/PlaidImport.jsx b/frontend/src/components/PlaidImport.jsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..d8de7a61e2385bfedef12b98eced32de5c95b125
+--- /dev/null
++++ b/frontend/src/components/PlaidImport.jsx
+@@ -0,0 +1,62 @@
++import React, { useState } from 'react';
++import axios from 'axios';
++
++const PlaidImport = ({ onComplete }) => {
++  const [form, setForm] = useState({ accessToken: '', startDate: '', endDate: '' });
++  const [status, setStatus] = useState('');
++  const [isLoading, setIsLoading] = useState(false);
++
++  const handleChange = (event) => {
++    const { name, value } = event.target;
++    setForm((prev) => ({ ...prev, [name]: value }));
++  };
++
++  const handleSubmit = async (event) => {
++    event.preventDefault();
++    if (!form.accessToken || !form.startDate || !form.endDate) {
++      setStatus('Fill in all Plaid details.');
++      return;
++    }
++
++    setIsLoading(true);
++    setStatus('');
++    try {
++      const response = await axios.post('/api/transactions/import/plaid', {
++        access_token: form.accessToken,
++        start_date: form.startDate,
++        end_date: form.endDate,
++      });
++      setStatus(`Imported ${response.data.imported} transactions from Plaid.`);
++      onComplete?.();
++    } catch (error) {
++      setStatus(error.response?.data?.detail ?? 'Plaid import failed.');
++    } finally {
++      setIsLoading(false);
++    }
++  };
++
++  return (
++    <div className="action-card">
++      <h3>Plaid Import</h3>
++      <p>Provide an access token to pull transactions from linked Plaid accounts.</p>
++      <form onSubmit={handleSubmit}>
++        <input
++          name="accessToken"
++          placeholder="Access token"
++          value={form.accessToken}
++          onChange={handleChange}
++        />
++        <div className="date-range">
++          <input type="date" name="startDate" value={form.startDate} onChange={handleChange} />
++          <input type="date" name="endDate" value={form.endDate} onChange={handleChange} />
++        </div>
++        <button type="submit" disabled={isLoading}>
++          {isLoading ? 'Syncing…' : 'Sync with Plaid'}
++        </button>
++      </form>
++      {status && <p className="status">{status}</p>}
++    </div>
++  );
++};
++
++export default PlaidImport;
+diff --git a/frontend/src/components/TransactionsTable.jsx b/frontend/src/components/TransactionsTable.jsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..8af77a909afb29e1f6a3e6d4f8efb56ca3d0aeaa
+--- /dev/null
++++ b/frontend/src/components/TransactionsTable.jsx
+@@ -0,0 +1,39 @@
++import React from 'react';
++import dayjs from 'dayjs';
++
++const TransactionsTable = ({ transactions }) => {
++  if (!transactions.length) {
++    return <p>No transactions yet. Import a CSV or connect via Plaid.</p>;
++  }
++
++  return (
++    <div className="table-wrapper">
++      <table>
++        <thead>
++          <tr>
++            <th>Date</th>
++            <th>Description</th>
++            <th>Category</th>
++            <th>Account</th>
++            <th>Amount</th>
++          </tr>
++        </thead>
++        <tbody>
++          {transactions.map((txn) => (
++            <tr key={txn.id}>
++              <td>{dayjs(txn.date).format('MMM D, YYYY')}</td>
++              <td>{txn.description}</td>
++              <td>{txn.category ? txn.category.name : '—'}</td>
++              <td>{txn.account_name || txn.source || '—'}</td>
++              <td className={txn.amount >= 0 ? 'positive' : 'negative'}>
++                ${txn.amount.toFixed(2)}
++              </td>
++            </tr>
++          ))}
++        </tbody>
++      </table>
++    </div>
++  );
++};
++
++export default TransactionsTable;
+diff --git a/frontend/src/components/UploadTransactions.jsx b/frontend/src/components/UploadTransactions.jsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..7678dcc8d2ee4e78fdc81b566623c97dde092825
+--- /dev/null
++++ b/frontend/src/components/UploadTransactions.jsx
+@@ -0,0 +1,43 @@
++import React, { useState } from 'react';
++import axios from 'axios';
++
++const UploadTransactions = ({ onComplete }) => {
++  const [isUploading, setIsUploading] = useState(false);
++  const [message, setMessage] = useState('');
++
++  const handleUpload = async (event) => {
++    const file = event.target.files?.[0];
++    if (!file) return;
++
++    const formData = new FormData();
++    formData.append('file', file);
++
++    setIsUploading(true);
++    setMessage('');
++    try {
++      const response = await axios.post('/api/transactions/import/csv', formData, {
++        headers: { 'Content-Type': 'multipart/form-data' },
++      });
++      setMessage(`Imported ${response.data.imported} transactions.`);
++      onComplete?.();
++    } catch (error) {
++      setMessage(error.response?.data?.detail ?? 'Failed to import file.');
++    } finally {
++      setIsUploading(false);
++    }
++  };
++
++  return (
++    <div className="action-card">
++      <h3>Upload Transactions</h3>
++      <p>Drop a CSV exported from your bank (Chase, Amex, Citi, Venmo, etc.).</p>
++      <label className="upload">
++        <input type="file" accept=".csv" onChange={handleUpload} disabled={isUploading} />
++        <span>{isUploading ? 'Uploading…' : 'Choose File'}</span>
++      </label>
++      {message && <p className="status">{message}</p>}
++    </div>
++  );
++};
++
++export default UploadTransactions;
+diff --git a/frontend/src/main.jsx b/frontend/src/main.jsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..a85a820630dc7be68628dcfbe8c16a09f2a9ca31
+--- /dev/null
++++ b/frontend/src/main.jsx
+@@ -0,0 +1,18 @@
++import React from 'react';
++import ReactDOM from 'react-dom/client';
++import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
++import { BrowserRouter } from 'react-router-dom';
++import App from './App.jsx';
++import './styles.css';
++
++const queryClient = new QueryClient();
++
++ReactDOM.createRoot(document.getElementById('root')).render(
++  <React.StrictMode>
++    <QueryClientProvider client={queryClient}>
++      <BrowserRouter>
++        <App />
++      </BrowserRouter>
++    </QueryClientProvider>
++  </React.StrictMode>
++);
+diff --git a/frontend/src/styles.css b/frontend/src/styles.css
+new file mode 100644
+index 0000000000000000000000000000000000000000..90cf6f3ddc179f2cfe7236c64aa3c98426e1a8fd
+--- /dev/null
++++ b/frontend/src/styles.css
+@@ -0,0 +1,198 @@
++:root {
++  color-scheme: light dark;
++  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
++  line-height: 1.5;
++  font-weight: 400;
++  background: #f6f8fb;
++  color: #0f172a;
++}
++
++body {
++  margin: 0;
++  min-height: 100vh;
++}
++
++.app-shell {
++  display: flex;
++  flex-direction: column;
++  min-height: 100vh;
++}
++
++.app-header {
++  display: flex;
++  justify-content: space-between;
++  align-items: center;
++  padding: 1.5rem 2rem;
++  background: linear-gradient(135deg, #2563eb, #4338ca);
++  color: white;
++}
++
++.app-header a {
++  color: white;
++  text-decoration: none;
++  margin-left: 1rem;
++}
++
++.app-footer {
++  padding: 1rem;
++  text-align: center;
++  background: #e2e8f0;
++}
++
++main {
++  flex: 1;
++  padding: 2rem;
++}
++
++.dashboard {
++  display: flex;
++  flex-direction: column;
++  gap: 2rem;
++}
++
++.grid {
++  display: grid;
++  gap: 1.5rem;
++}
++
++.stats {
++  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
++}
++
++.main {
++  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
++}
++
++.card {
++  background: white;
++  padding: 1.5rem;
++  border-radius: 1rem;
++  box-shadow: 0 15px 35px rgba(15, 23, 42, 0.08);
++  display: flex;
++  flex-direction: column;
++  gap: 0.75rem;
++}
++
++.card.wide {
++  grid-column: span 2;
++}
++
++.card.positive {
++  border-left: 6px solid #16a34a;
++}
++
++.card.negative {
++  border-left: 6px solid #dc2626;
++}
++
++.actions {
++  display: grid;
++  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
++  gap: 1.5rem;
++}
++
++.action-card {
++  background: white;
++  padding: 1.5rem;
++  border-radius: 1rem;
++  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
++  display: flex;
++  flex-direction: column;
++  gap: 0.75rem;
++}
++
++.action-card button {
++  padding: 0.75rem 1rem;
++  border-radius: 0.75rem;
++  border: none;
++  background: #2563eb;
++  color: white;
++  cursor: pointer;
++}
++
++.action-card button:disabled {
++  opacity: 0.6;
++  cursor: not-allowed;
++}
++
++.upload input[type='file'] {
++  display: none;
++}
++
++.upload span {
++  display: inline-flex;
++  padding: 0.75rem 1rem;
++  background: #0f172a;
++  color: white;
++  border-radius: 0.75rem;
++  cursor: pointer;
++}
++
++.table-wrapper {
++  overflow-x: auto;
++}
++
++table {
++  width: 100%;
++  border-collapse: collapse;
++}
++
++table th,
++table td {
++  padding: 0.75rem;
++  border-bottom: 1px solid #e2e8f0;
++  text-align: left;
++}
++
++table td.positive {
++  color: #16a34a;
++}
++
++table td.negative {
++  color: #dc2626;
++}
++
++.budget-list,
++.insights {
++  list-style: none;
++  margin: 0;
++  padding: 0;
++  display: flex;
++  flex-direction: column;
++  gap: 1rem;
++}
++
++.budget-list li,
++.insights li {
++  display: flex;
++  justify-content: space-between;
++  align-items: center;
++  gap: 0.5rem;
++}
++
++.budget-list small {
++  background: #2563eb;
++  color: white;
++  padding: 0.2rem 0.5rem;
++  border-radius: 0.5rem;
++}
++
++.status {
++  font-size: 0.9rem;
++  color: #1e293b;
++}
++
++.date-range {
++  display: flex;
++  gap: 0.5rem;
++}
++
++@media (max-width: 768px) {
++  main {
++    padding: 1rem;
++  }
++
++  .card.wide {
++    grid-column: span 1;
++  }
++}
+diff --git a/frontend/vite.config.js b/frontend/vite.config.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..d389b2a3e02b0692058267da32188dab403dc328
+--- /dev/null
++++ b/frontend/vite.config.js
+@@ -0,0 +1,20 @@
++import { defineConfig } from 'vite';
++import react from '@vitejs/plugin-react';
++
++export default defineConfig({
++  plugins: [react()],
++  server: {
++    host: '0.0.0.0',
++    port: 5173,
++    proxy: {
++      '/api': {
++        target: 'http://backend:8000',
++        changeOrigin: true,
++        rewrite: (path) => path.replace(/^\/api/, ''),
++      },
++    },
++  },
++  build: {
++    outDir: 'dist',
++  },
++});
+diff --git a/scripts/check_no_binaries.py b/scripts/check_no_binaries.py
+new file mode 100755
+index 0000000000000000000000000000000000000000..3a33ab26c14eb4a82324a52c9396df11cc63aee8
+--- /dev/null
++++ b/scripts/check_no_binaries.py
+@@ -0,0 +1,65 @@
++#!/usr/bin/env python3
++"""Detect committed files that appear to be binary artifacts.
++
++The script scans the repository for tracked files that do not decode as UTF-8
++text. It helps keep the project source-only so PRs are not blocked by binary
++assets. Returns a non-zero exit code if a binary file is detected.
++"""
++
++from __future__ import annotations
++
++import subprocess
++from pathlib import Path
++
++REPO_ROOT = Path(__file__).resolve().parents[1]
++
++
++def git_tracked_files() -> list[Path]:
++    result = subprocess.run(
++        ["git", "ls-files"],
++        cwd=REPO_ROOT,
++        check=True,
++        text=True,
++        capture_output=True,
++    )
++    return [REPO_ROOT / Path(line.strip()) for line in result.stdout.splitlines() if line.strip()]
++
++
++def is_binary(path: Path) -> bool:
++    try:
++        data = path.read_bytes()
++    except OSError:
++        return False
++
++    if not data:
++        return False
++
++    if b"\0" in data:
++        return True
++
++    try:
++        data.decode("utf-8")
++        return False
++    except UnicodeDecodeError:
++        return True
++
++
++def main() -> int:
++    binaries: list[Path] = []
++    for file_path in git_tracked_files():
++        if is_binary(file_path):
++            binaries.append(file_path.relative_to(REPO_ROOT))
++
++    if binaries:
++        print("Binary-like files detected:\n")
++        for binary in binaries:
++            print(f" - {binary}")
++        print("\nRemove these files or add them to .gitignore before committing.")
++        return 1
++
++    print("No binary files detected among tracked sources.")
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/scripts/generate_sample_transactions.py b/scripts/generate_sample_transactions.py
+new file mode 100755
+index 0000000000000000000000000000000000000000..d24f9483b2fb60ef25be1de567d520820628e46d
+--- /dev/null
++++ b/scripts/generate_sample_transactions.py
+@@ -0,0 +1,71 @@
++#!/usr/bin/env python3
++"""Generate synthetic transaction CSVs for local testing.
++
++The generated files live in samples/ (ignored by Git) so that developers do not
++need to commit binary spreadsheet exports.
++"""
++
++from __future__ import annotations
++
++import csv
++from dataclasses import dataclass
++from datetime import date, timedelta
++from pathlib import Path
++from random import choice, randint, uniform
++
++SAMPLES_DIR = Path("samples")
++SAMPLES_DIR.mkdir(exist_ok=True)
++
++@dataclass
++class SampleCategory:
++    name: str
++    descriptions: tuple[str, ...]
++    amount_range: tuple[float, float]
++
++CATEGORIES = [
++    SampleCategory("Groceries", ("Whole Foods", "Trader Joe's", "Supermarket"), (-120.0, -20.0)),
++    SampleCategory("Dining", ("Restaurant", "Cafe", "Delivery"), (-80.0, -10.0)),
++    SampleCategory("Transportation", ("Lyft", "Uber", "Gas Station"), (-60.0, -15.0)),
++    SampleCategory("Utilities", ("Electric", "Water", "Internet"), (-200.0, -40.0)),
++    SampleCategory("Entertainment", ("Streaming", "Bookstore", "Concert"), (-150.0, -15.0)),
++    SampleCategory("Salary", ("Payroll", "Employer Deposit"), (1500.0, 3200.0)),
++]
++
++HEADER = ["date", "description", "amount", "account", "category"]
++
++def generate_transactions(days: int = 60, rows: int = 200) -> list[list[str]]:
++    start = date.today() - timedelta(days=days)
++    data: list[list[str]] = []
++    for _ in range(rows):
++        day_offset = randint(0, days)
++        category = choice(CATEGORIES)
++        amount = round(uniform(*category.amount_range), 2)
++        data.append(
++            [
++                (start + timedelta(days=day_offset)).isoformat(),
++                choice(category.descriptions),
++                f"{amount:.2f}",
++                choice(["Checking", "Credit Card", "Savings"]),
++                category.name,
++            ]
++        )
++    return sorted(data, key=lambda row: row[0], reverse=True)
++
++def write_csv(filename: str, rows: list[list[str]]) -> None:
++    path = (SAMPLES_DIR / filename).resolve()
++    with path.open("w", newline="") as f:
++        writer = csv.writer(f)
++        writer.writerow(HEADER)
++        writer.writerows(rows)
++    try:
++        display = path.relative_to(Path.cwd())
++    except ValueError:
++        display = path
++    print(f"wrote {display}")
++
++def main() -> None:
++    rows = generate_transactions()
++    write_csv("transactions_sample.csv", rows)
++
++if __name__ == "__main__":
++    main()
+ 
+EOF
+)
