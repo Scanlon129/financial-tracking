@@ -1,0 +1,710 @@
+diff --git a/frontend/.dockerignore b/frontend/.dockerignore
+new file mode 100644
+--- /dev/null
++++ b/frontend/.dockerignore
+@@ -0,0 +1,4 @@
++node_modules
++npm-debug.log
++dist
++.DS_Store
+diff --git a/frontend/Dockerfile b/frontend/Dockerfile
+new file mode 100644
+--- /dev/null
++++ b/frontend/Dockerfile
+@@ -0,0 +1,16 @@
++FROM node:18-alpine
++
++WORKDIR /usr/src/app
++
++COPY package*.json ./
++RUN npm install
++
++COPY . .
++
++RUN npm run build
++
++RUN npm install -g serve
++
++EXPOSE 4173
++
++CMD ["serve", "-s", "dist", "-l", "4173"]
+diff --git a/frontend/package.json b/frontend/package.json
+new file mode 100644
+--- /dev/null
++++ b/frontend/package.json
+@@ -0,0 +1,23 @@
++{
++  "name": "financial-tracking-frontend",
++  "version": "1.0.0",
++  "private": true,
++  "type": "module",
++  "scripts": {
++    "dev": "vite",
++    "build": "vite build",
++    "preview": "vite preview --host 0.0.0.0 --port 4173"
++  },
++  "dependencies": {
++    "@tanstack/react-query": "5.36.1",
++    "axios": "1.6.8",
++    "dayjs": "1.11.10",
++    "react": "18.2.0",
++    "react-dom": "18.2.0",
++    "react-router-dom": "6.23.1"
++  },
++  "devDependencies": {
++    "@vitejs/plugin-react": "4.3.0",
++    "vite": "5.2.9"
++  }
++}
+diff --git a/frontend/vite.config.js b/frontend/vite.config.js
+new file mode 100644
+--- /dev/null
++++ b/frontend/vite.config.js
+@@ -0,0 +1,20 @@
++import { defineConfig } from 'vite';
++import react from '@vitejs/plugin-react';
++
++export default defineConfig({
++  plugins: [react()],
++  server: {
++    host: '0.0.0.0',
++    port: 5173,
++    proxy: {
++      '/api': {
++        target: 'http://backend:8000',
++        changeOrigin: true,
++        rewrite: (path) => path.replace(/^\/api/, ''),
++      },
++    },
++  },
++  build: {
++    outDir: 'dist',
++  },
++});
+diff --git a/frontend/index.html b/frontend/index.html
+new file mode 100644
+--- /dev/null
++++ b/frontend/index.html
+@@ -0,0 +1,12 @@
++<!doctype html>
++<html lang="en">
++  <head>
++    <meta charset="UTF-8" />
++    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++    <title>Financial Tracking</title>
++  </head>
++  <body>
++    <div id="root"></div>
++    <script type="module" src="/src/main.jsx"></script>
++  </body>
++  </html>
+diff --git a/frontend/src/main.jsx b/frontend/src/main.jsx
+new file mode 100644
+--- /dev/null
++++ b/frontend/src/main.jsx
+@@ -0,0 +1,18 @@
++import React from 'react';
++import ReactDOM from 'react-dom/client';
++import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
++import { BrowserRouter } from 'react-router-dom';
++import App from './App.jsx';
++import './styles.css';
++
++const queryClient = new QueryClient();
++
++ReactDOM.createRoot(document.getElementById('root')).render(
++  <React.StrictMode>
++    <QueryClientProvider client={queryClient}>
++      <BrowserRouter>
++        <App />
++      </BrowserRouter>
++    </QueryClientProvider>
++  </React.StrictMode>
++);
+diff --git a/frontend/src/App.jsx b/frontend/src/App.jsx
+new file mode 100644
+--- /dev/null
++++ b/frontend/src/App.jsx
+@@ -0,0 +1,24 @@
++import React from 'react';
++import { Routes, Route, Link } from 'react-router-dom';
++import DashboardPage from './components/DashboardPage.jsx';
++
++const App = () => {
++  return (
++    <div className="app-shell">
++      <header className="app-header">
++        <h1>Financial Tracking</h1>
++        <nav>
++          <Link to="/">Dashboard</Link>
++        </nav>
++      </header>
++      <main>
++        <Routes>
++          <Route path="/" element={<DashboardPage />} />
++        </Routes>
++      </main>
++      <footer className="app-footer">Built with FastAPI, React &amp; AI assistance.</footer>
++    </div>
++  );
++};
++
++export default App;
+diff --git a/frontend/src/components/DashboardPage.jsx b/frontend/src/components/DashboardPage.jsx
+new file mode 100644
+--- /dev/null
++++ b/frontend/src/components/DashboardPage.jsx
+@@ -0,0 +1,134 @@
++import React, { useMemo } from 'react';
++import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
++import axios from 'axios';
++import TransactionsTable from './TransactionsTable.jsx';
++import BudgetList from './BudgetList.jsx';
++import UploadTransactions from './UploadTransactions.jsx';
++import PlaidImport from './PlaidImport.jsx';
++import InsightsPanel from './InsightsPanel.jsx';
++
++const api = axios.create({
++  baseURL: '/api',
++});
++
++const DashboardPage = () => {
++  const queryClient = useQueryClient();
++
++  const { data: categories = [] } = useQuery({
++    queryKey: ['categories'],
++    queryFn: async () => (await api.get('/categories')).data,
++  });
++
++  const { data: transactions = [] } = useQuery({
++    queryKey: ['transactions'],
++    queryFn: async () => (await api.get('/transactions')).data,
++  });
++
++  const { data: budgets = [] } = useQuery({
++    queryKey: ['budgets'],
++    queryFn: async () => (await api.get('/budgets')).data,
++  });
++
++  const { data: insights = [] } = useQuery({
++    queryKey: ['insights'],
++    queryFn: async () => (await api.get('/insights')).data,
++  });
++
++  const autoCategorizeMutation = useMutation({
++    mutationFn: async () => (await api.post('/transactions/auto-categorize')).data,
++    onSuccess: () => {
++      queryClient.invalidateQueries({ queryKey: ['transactions'] });
++      queryClient.invalidateQueries({ queryKey: ['categories'] });
++    },
++  });
++
++  const autoBudgetMutation = useMutation({
++    mutationFn: async () => (await api.post('/budgets/auto')).data,
++    onSuccess: () => {
++      queryClient.invalidateQueries({ queryKey: ['budgets'] });
++    },
++  });
++
++  const totals = useMemo(() => {
++    const income = transactions
++      .filter((txn) => txn.amount > 0)
++      .reduce((acc, txn) => acc + txn.amount, 0);
++    const expenses = transactions
++      .filter((txn) => txn.amount < 0)
++      .reduce((acc, txn) => acc + txn.amount, 0);
++    return {
++      income,
++      expenses,
++      net: income + expenses,
++    };
++  }, [transactions]);
++
++  return (
++    <div className="dashboard">
++      <section className="grid stats">
++        <div className="card">
++          <h2>Income</h2>
++          <p>${totals.income.toFixed(2)}</p>
++        </div>
++        <div className="card">
++          <h2>Expenses</h2>
++          <p>${Math.abs(totals.expenses).toFixed(2)}</p>
++        </div>
++        <div className={`card ${totals.net >= 0 ? 'positive' : 'negative'}`}>
++          <h2>Net</h2>
++          <p>${totals.net.toFixed(2)}</p>
++        </div>
++        <div className="card">
++          <h2>Categories</h2>
++          <p>{categories.length}</p>
++        </div>
++      </section>
++
++      <section className="actions">
++        <UploadTransactions
++          onComplete={() => {
++            queryClient.invalidateQueries({ queryKey: ['transactions'] });
++            queryClient.invalidateQueries({ queryKey: ['categories'] });
++          }}
++        />
++        <PlaidImport
++          onComplete={() => queryClient.invalidateQueries({ queryKey: ['transactions'] })}
++        />
++        <div className="action-card">
++          <h3>AI Tools</h3>
++          <button onClick={() => autoCategorizeMutation.mutate()} disabled={autoCategorizeMutation.isLoading}>
++            {autoCategorizeMutation.isLoading ? 'Categorizing…' : 'Auto-categorize'}
++          </button>
++          <button onClick={() => autoBudgetMutation.mutate()} disabled={autoBudgetMutation.isLoading}>
++            {autoBudgetMutation.isLoading ? 'Generating…' : 'Auto budget'}
++          </button>
++          {autoCategorizeMutation.data && (
++            <p>
++              Updated {autoCategorizeMutation.data.updated} transactions.
++              {autoCategorizeMutation.data.uncategorized > 0 && (
++                <span> {autoCategorizeMutation.data.uncategorized} remaining uncategorized.</span>
++              )}
++            </p>
++          )}
++        </div>
++      </section>
++
++      <section className="grid main">
++        <div className="card wide">
++          <h2>Recent Transactions</h2>
++          <TransactionsTable transactions={transactions} />
++        </div>
++        <div className="card">
++          <h2>Budgets</h2>
++          <BudgetList budgets={budgets} />
++        </div>
++        <div className="card">
++          <h2>Insights</h2>
++          <InsightsPanel insights={insights} />
++        </div>
++      </section>
++    </div>
++  );
++};
++
++export default DashboardPage;
+diff --git a/frontend/src/components/TransactionsTable.jsx b/frontend/src/components/TransactionsTable.jsx
+new file mode 100644
+--- /dev/null
++++ b/frontend/src/components/TransactionsTable.jsx
+@@ -0,0 +1,39 @@
++import React from 'react';
++import dayjs from 'dayjs';
++
++const TransactionsTable = ({ transactions }) => {
++  if (!transactions.length) {
++    return <p>No transactions yet. Import a CSV or connect via Plaid.</p>;
++  }
++
++  return (
++    <div className="table-wrapper">
++      <table>
++        <thead>
++          <tr>
++            <th>Date</th>
++            <th>Description</th>
++            <th>Category</th>
++            <th>Account</th>
++            <th>Amount</th>
++          </tr>
++        </thead>
++        <tbody>
++          {transactions.map((txn) => (
++            <tr key={txn.id}>
++              <td>{dayjs(txn.date).format('MMM D, YYYY')}</td>
++              <td>{txn.description}</td>
++              <td>{txn.category ? txn.category.name : '—'}</td>
++              <td>{txn.account_name || txn.source || '—'}</td>
++              <td className={txn.amount >= 0 ? 'positive' : 'negative'}>
++                ${txn.amount.toFixed(2)}
++              </td>
++            </tr>
++          ))}
++        </tbody>
++      </table>
++    </div>
++  );
++};
++
++export default TransactionsTable;
+diff --git a/frontend/src/components/BudgetList.jsx b/frontend/src/components/BudgetList.jsx
+new file mode 100644
+--- /dev/null
++++ b/frontend/src/components/BudgetList.jsx
+@@ -0,0 +1,26 @@
++import React from 'react';
++
++const BudgetList = ({ budgets }) => {
++  if (!budgets.length) {
++    return <p>No budgets configured yet. Try generating them with AI.</p>;
++  }
++
++  return (
++    <ul className="budget-list">
++      {budgets.map((budget) => (
++        <li key={budget.id}>
++          <div>
++            <strong>{budget.category?.name ?? 'Uncategorized'}</strong>
++            <span>{budget.period}</span>
++          </div>
++          <div>
++            <span>${budget.amount.toFixed(2)}</span>
++            {budget.ai_generated && <small>AI</small>}
++          </div>
++        </li>
++      ))}
++    </ul>
++  );
++};
++
++export default BudgetList;
+diff --git a/frontend/src/components/UploadTransactions.jsx b/frontend/src/components/UploadTransactions.jsx
+new file mode 100644
+--- /dev/null
++++ b/frontend/src/components/UploadTransactions.jsx
+@@ -0,0 +1,43 @@
++import React, { useState } from 'react';
++import axios from 'axios';
++
++const UploadTransactions = ({ onComplete }) => {
++  const [isUploading, setIsUploading] = useState(false);
++  const [message, setMessage] = useState('');
++
++  const handleUpload = async (event) => {
++    const file = event.target.files?.[0];
++    if (!file) return;
++
++    const formData = new FormData();
++    formData.append('file', file);
++
++    setIsUploading(true);
++    setMessage('');
++    try {
++      const response = await axios.post('/api/transactions/import/csv', formData, {
++        headers: { 'Content-Type': 'multipart/form-data' },
++      });
++      setMessage(`Imported ${response.data.imported} transactions.`);
++      onComplete?.();
++    } catch (error) {
++      setMessage(error.response?.data?.detail ?? 'Failed to import file.');
++    } finally {
++      setIsUploading(false);
++    }
++  };
++
++  return (
++    <div className="action-card">
++      <h3>Upload Transactions</h3>
++      <p>Drop a CSV exported from your bank (Chase, Amex, Citi, Venmo, etc.).</p>
++      <label className="upload">
++        <input type="file" accept=".csv" onChange={handleUpload} disabled={isUploading} />
++        <span>{isUploading ? 'Uploading…' : 'Choose File'}</span>
++      </label>
++      {message && <p className="status">{message}</p>}
++    </div>
++  );
++};
++
++export default UploadTransactions;
+diff --git a/frontend/src/components/PlaidImport.jsx b/frontend/src/components/PlaidImport.jsx
+new file mode 100644
+--- /dev/null
++++ b/frontend/src/components/PlaidImport.jsx
+@@ -0,0 +1,62 @@
++import React, { useState } from 'react';
++import axios from 'axios';
++
++const PlaidImport = ({ onComplete }) => {
++  const [form, setForm] = useState({ accessToken: '', startDate: '', endDate: '' });
++  const [status, setStatus] = useState('');
++  const [isLoading, setIsLoading] = useState(false);
++
++  const handleChange = (event) => {
++    const { name, value } = event.target;
++    setForm((prev) => ({ ...prev, [name]: value }));
++  };
++
++  const handleSubmit = async (event) => {
++    event.preventDefault();
++    if (!form.accessToken || !form.startDate || !form.endDate) {
++      setStatus('Fill in all Plaid details.');
++      return;
++    }
++
++    setIsLoading(true);
++    setStatus('');
++    try {
++      const response = await axios.post('/api/transactions/import/plaid', {
++        access_token: form.accessToken,
++        start_date: form.startDate,
++        end_date: form.endDate,
++      });
++      setStatus(`Imported ${response.data.imported} transactions from Plaid.`);
++      onComplete?.();
++    } catch (error) {
++      setStatus(error.response?.data?.detail ?? 'Plaid import failed.');
++    } finally {
++      setIsLoading(false);
++    }
++  };
++
++  return (
++    <div className="action-card">
++      <h3>Plaid Import</h3>
++      <p>Provide an access token to pull transactions from linked Plaid accounts.</p>
++      <form onSubmit={handleSubmit}>
++        <input
++          name="accessToken"
++          placeholder="Access token"
++          value={form.accessToken}
++          onChange={handleChange}
++        />
++        <div className="date-range">
++          <input type="date" name="startDate" value={form.startDate} onChange={handleChange} />
++          <input type="date" name="endDate" value={form.endDate} onChange={handleChange} />
++        </div>
++        <button type="submit" disabled={isLoading}>
++          {isLoading ? 'Syncing…' : 'Sync with Plaid'}
++        </button>
++      </form>
++      {status && <p className="status">{status}</p>}
++    </div>
++  );
++};
++
++export default PlaidImport;
+diff --git a/frontend/src/components/InsightsPanel.jsx b/frontend/src/components/InsightsPanel.jsx
+new file mode 100644
+--- /dev/null
++++ b/frontend/src/components/InsightsPanel.jsx
+@@ -0,0 +1,21 @@
++import React from 'react';
++
++const InsightsPanel = ({ insights }) => {
++  if (!insights.length) {
++    return <p>No insights yet. Import transactions to get AI-driven suggestions.</p>;
++  }
++
++  return (
++    <ul className="insights">
++      {insights.map((insight, index) => (
++        <li key={index}>
++          <h4>{insight.title}</h4>
++          <p>{insight.detail}</p>
++          {insight.action && <span>{insight.action}</span>}
++        </li>
++      ))}
++    </ul>
++  );
++};
++
++export default InsightsPanel;
+diff --git a/frontend/src/styles.css b/frontend/src/styles.css
+new file mode 100644
+--- /dev/null
++++ b/frontend/src/styles.css
+@@ -0,0 +1,198 @@
++:root {
++  color-scheme: light dark;
++  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
++  line-height: 1.5;
++  font-weight: 400;
++  background: #f6f8fb;
++  color: #0f172a;
++}
++
++body {
++  margin: 0;
++  min-height: 100vh;
++}
++
++.app-shell {
++  display: flex;
++  flex-direction: column;
++  min-height: 100vh;
++}
++
++.app-header {
++  display: flex;
++  justify-content: space-between;
++  align-items: center;
++  padding: 1.5rem 2rem;
++  background: linear-gradient(135deg, #2563eb, #4338ca);
++  color: white;
++}
++
++.app-header a {
++  color: white;
++  text-decoration: none;
++  margin-left: 1rem;
++}
++
++.app-footer {
++  padding: 1rem;
++  text-align: center;
++  background: #e2e8f0;
++}
++
++main {
++  flex: 1;
++  padding: 2rem;
++}
++
++.dashboard {
++  display: flex;
++  flex-direction: column;
++  gap: 2rem;
++}
++
++.grid {
++  display: grid;
++  gap: 1.5rem;
++}
++
++.stats {
++  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
++}
++
++.main {
++  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
++}
++
++.card {
++  background: white;
++  padding: 1.5rem;
++  border-radius: 1rem;
++  box-shadow: 0 15px 35px rgba(15, 23, 42, 0.08);
++  display: flex;
++  flex-direction: column;
++  gap: 0.75rem;
++}
++
++.card.wide {
++  grid-column: span 2;
++}
++
++.card.positive {
++  border-left: 6px solid #16a34a;
++}
++
++.card.negative {
++  border-left: 6px solid #dc2626;
++}
++
++.actions {
++  display: grid;
++  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
++  gap: 1.5rem;
++}
++
++.action-card {
++  background: white;
++  padding: 1.5rem;
++  border-radius: 1rem;
++  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
++  display: flex;
++  flex-direction: column;
++  gap: 0.75rem;
++}
++
++.action-card button {
++  padding: 0.75rem 1rem;
++  border-radius: 0.75rem;
++  border: none;
++  background: #2563eb;
++  color: white;
++  cursor: pointer;
++}
++
++.action-card button:disabled {
++  opacity: 0.6;
++  cursor: not-allowed;
++}
++
++.upload input[type='file'] {
++  display: none;
++}
++
++.upload span {
++  display: inline-flex;
++  padding: 0.75rem 1rem;
++  background: #0f172a;
++  color: white;
++  border-radius: 0.75rem;
++  cursor: pointer;
++}
++
++.table-wrapper {
++  overflow-x: auto;
++}
++
++table {
++  width: 100%;
++  border-collapse: collapse;
++}
++
++table th,
++table td {
++  padding: 0.75rem;
++  border-bottom: 1px solid #e2e8f0;
++  text-align: left;
++}
++
++table td.positive {
++  color: #16a34a;
++}
++
++table td.negative {
++  color: #dc2626;
++}
++
++.budget-list,
++.insights {
++  list-style: none;
++  margin: 0;
++  padding: 0;
++  display: flex;
++  flex-direction: column;
++  gap: 1rem;
++}
++
++.budget-list li,
++.insights li {
++  display: flex;
++  justify-content: space-between;
++  align-items: center;
++  gap: 0.5rem;
++}
++
++.budget-list small {
++  background: #2563eb;
++  color: white;
++  padding: 0.2rem 0.5rem;
++  border-radius: 0.5rem;
++}
++
++.status {
++  font-size: 0.9rem;
++  color: #1e293b;
++}
++
++.date-range {
++  display: flex;
++  gap: 0.5rem;
++}
++
++@media (max-width: 768px) {
++  main {
++    padding: 1rem;
++  }
++
++  .card.wide {
++    grid-column: span 1;
++  }
++}

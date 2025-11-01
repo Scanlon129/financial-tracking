@@ -1,0 +1,138 @@
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,11 @@
++.env
++__pycache__/
++*.pyc
++*.pyo
++*.pyd
++backend/app.db
++backend/.venv/
++frontend/node_modules/
++frontend/dist/
++samples/
++.DS_Store
+diff --git a/docker-compose.yml b/docker-compose.yml
+new file mode 100644
+--- /dev/null
++++ b/docker-compose.yml
+@@ -0,0 +1,24 @@
++version: '3.9'
++services:
++  backend:
++    build: ./backend
++    environment:
++      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
++      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o-mini}
++      - PLAID_CLIENT_ID=${PLAID_CLIENT_ID:-}
++      - PLAID_SECRET=${PLAID_SECRET:-}
++      - PLAID_ENV=${PLAID_ENV:-sandbox}
++    volumes:
++      - backend_data:/app
++    ports:
++      - "8000:8000"
++  frontend:
++    build: ./frontend
++    depends_on:
++      - backend
++    environment:
++      - VITE_API_URL=http://backend:8000
++    ports:
++      - "4173:4173"
++volumes:
++  backend_data:
+diff --git a/env.example b/env.example
+new file mode 100644
+--- /dev/null
++++ b/env.example
+@@ -0,0 +1,8 @@
++# Backend AI configuration
++OPENAI_API_KEY=
++OPENAI_MODEL=gpt-4o-mini
++
++# Plaid configuration
++PLAID_CLIENT_ID=
++PLAID_SECRET=
++PLAID_ENV=sandbox
+diff --git a/docs/BINARY_ASSET_WORKFLOW.md b/docs/BINARY_ASSET_WORKFLOW.md
+new file mode 100644
+--- /dev/null
++++ b/docs/BINARY_ASSET_WORKFLOW.md
+@@ -0,0 +1,75 @@
++# Binary Asset Workflow
++
++Some corporate Git hosts block commits that contain generated or binary artifacts. This project keeps the repository
++source-only and rebuilds any binaries locally. Follow the steps below whenever you need the compiled assets.
++
++## Frontend build artifacts
++
++1. Install dependencies (requires Node 18+):
++   ```bash
++   cd frontend
++   npm install
++   ```
++2. Create a production bundle:
++   ```bash
++   npm run build
++   ```
++3. The generated assets are written to `frontend/dist/`. These files are ignored by Git. Deployments copy this folder into the
++   frontend container image during `docker-compose build`. If your Git provider blocks binary pushes, run the build locally and
++   include the build step in your CI/CD pipeline instead of committing the `dist` directory.
++
++## Backend compiled bytecode
++
++Python `.pyc` bytecode files and SQLite databases are created at runtime and excluded from the repository via `.gitignore`.
++To recreate them locally:
++
++```bash
++cd backend
++python -m venv .venv
++source .venv/bin/activate
++pip install -r requirements.txt
++python -m compileall app
++```
++
++This produces the same bytecode artifacts that appear when the backend container runs. Do **not** commit the resulting
++`__pycache__` directories or the SQLite database file; they are generated automatically when the service starts.
++
++## Docker images
++
++Docker images are binary blobs and cannot be pushed to Git. Build them locally or in your CI environment using:
++
++```bash
++docker-compose build
++```
++
++The `Dockerfile`s copy only source code and install dependencies so the resulting image is reproducible without storing binaries
++in Git.
++
++## Sample data files
++
++If you need example transactions for testing, generate them from the provided template instead of committing exported spreadsheets.
++Run:
++
++```bash
++python scripts/generate_sample_transactions.py
++```
++
++This script writes CSV files under `samples/` (ignored by Git). You can adjust the generator to mirror your data without uploading
++proprietary bank exports.
++
++## CI/CD tip
++
++Configure your CI pipeline to run the commands above as build steps. That way, reviewers can clone the repo, execute the documented
++scripts, and produce the same binaries locally—no binary commits required.
++
++## Check for binary files before committing
++
++Run the helper script below to verify that staged files decode as UTF-8 text and to catch stray binary artifacts before opening a
++pull request:
++
++```bash
++python scripts/check_no_binaries.py
++```
++
++The script returns a non-zero exit code and prints the offending paths if it detects binary-like content, helping you keep pull
++requests source-only.

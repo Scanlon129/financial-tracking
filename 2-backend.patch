@@ -1,0 +1,991 @@
+diff --git a/backend/.dockerignore b/backend/.dockerignore
+new file mode 100644
+--- /dev/null
++++ b/backend/.dockerignore
+@@ -0,0 +1,8 @@
++__pycache__
++*.pyc
++*.pyo
++*.pyd
++.env
++venv
++.venv
++app.db
+diff --git a/backend/Dockerfile b/backend/Dockerfile
+new file mode 100644
+--- /dev/null
++++ b/backend/Dockerfile
+@@ -0,0 +1,17 @@
++FROM python:3.11-slim
++
++ENV PYTHONDONTWRITEBYTECODE=1 \
++    PYTHONUNBUFFERED=1
++
++WORKDIR /app
++
++RUN apt-get update && apt-get install -y build-essential && rm -rf /var/lib/apt/lists/*
++
++COPY requirements.txt .
++RUN pip install --no-cache-dir -r requirements.txt
++
++COPY app ./app
++
++EXPOSE 8000
++
++CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+diff --git a/backend/requirements.txt b/backend/requirements.txt
+new file mode 100644
+--- /dev/null
++++ b/backend/requirements.txt
+@@ -0,0 +1,7 @@
++fastapi==0.111.0
++uvicorn[standard]==0.29.0
++sqlalchemy==2.0.30
++pydantic==1.10.15
++python-multipart==0.0.9
++openai==1.30.1
++plaid-python==16.0.0
+diff --git a/backend/app/__init__.py b/backend/app/__init__.py
+new file mode 100644
+--- /dev/null
++++ b/backend/app/__init__.py
+diff --git a/backend/app/database.py b/backend/app/database.py
+new file mode 100644
+--- /dev/null
++++ b/backend/app/database.py
+@@ -0,0 +1,27 @@
++from __future__ import annotations
++
++from contextlib import contextmanager
++from typing import Generator
++
++from sqlalchemy import create_engine
++from sqlalchemy.orm import declarative_base, sessionmaker
++
++DATABASE_URL = "sqlite:///./app.db"
++
++engine = create_engine(
++    DATABASE_URL,
++    connect_args={"check_same_thread": False},
++    pool_pre_ping=True,
++)
++SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
++
++Base = declarative_base()
++
++
++@contextmanager
++def get_session() -> Generator:
++    session = SessionLocal()
++    try:
++        yield session
++    finally:
++        session.close()
+diff --git a/backend/app/models.py b/backend/app/models.py
+new file mode 100644
+--- /dev/null
++++ b/backend/app/models.py
+@@ -0,0 +1,55 @@
++from __future__ import annotations
++
++from datetime import date, datetime
++
++from sqlalchemy import Boolean, Column, Date, DateTime, Float, ForeignKey, Integer, String, Text
++from sqlalchemy.dialects.sqlite import JSON
++from sqlalchemy.orm import relationship
++
++from .database import Base
++
++
++class TimestampMixin:
++    created_at = Column(DateTime, default=datetime.utcnow)
++    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
++
++
++class Category(Base, TimestampMixin):
++    __tablename__ = "categories"
++
++    id = Column(Integer, primary_key=True, index=True)
++    name = Column(String(255), unique=True, nullable=False)
++    type = Column(String(50), default="expense")
++    ai_suggested = Column(Boolean, default=False)
++
++    transactions = relationship("Transaction", back_populates="category")
++    budgets = relationship("Budget", back_populates="category")
++
++
++class Transaction(Base, TimestampMixin):
++    __tablename__ = "transactions"
++
++    id = Column(Integer, primary_key=True, index=True)
++    date = Column(Date, default=date.today, index=True)
++    description = Column(String(512), nullable=False)
++    amount = Column(Float, nullable=False)
++    category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
++    account_name = Column(String(255), nullable=True)
++    source = Column(String(255), nullable=True)
++    notes = Column(Text, nullable=True)
++    metadata = Column(JSON, nullable=True)
++
++    category = relationship("Category", back_populates="transactions")
++
++
++class Budget(Base, TimestampMixin):
++    __tablename__ = "budgets"
++
++    id = Column(Integer, primary_key=True, index=True)
++    category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
++    amount = Column(Float, nullable=False)
++    period = Column(String(50), default="monthly")
++    ai_generated = Column(Boolean, default=False)
++
++    category = relationship("Category", back_populates="budgets")
+diff --git a/backend/app/schemas.py b/backend/app/schemas.py
+new file mode 100644
+--- /dev/null
++++ b/backend/app/schemas.py
+@@ -0,0 +1,93 @@
++from __future__ import annotations
++
++from datetime import date, datetime
++from typing import Any, List, Optional
++
++from pydantic import BaseModel, Field
++
++
++class CategoryBase(BaseModel):
++    name: str
++    type: str = Field(default="expense", regex="^(income|expense)$")
++
++
++class CategoryCreate(CategoryBase):
++    pass
++
++
++class CategoryRead(CategoryBase):
++    id: int
++    ai_suggested: bool = False
++    created_at: datetime
++    updated_at: datetime
++
++    class Config:
++        orm_mode = True
++
++
++class TransactionBase(BaseModel):
++    date: date
++    description: str
++    amount: float
++    account_name: Optional[str] = None
++    source: Optional[str] = None
++    notes: Optional[str] = None
++    metadata: Optional[dict[str, Any]] = None
++
++
++class TransactionCreate(TransactionBase):
++    category_id: Optional[int] = None
++
++
++class TransactionRead(TransactionBase):
++    id: int
++    category: Optional[CategoryRead] = None
++    created_at: datetime
++    updated_at: datetime
++
++    class Config:
++        orm_mode = True
++
++
++class BudgetBase(BaseModel):
++    category_id: int
++    amount: float
++    period: str = Field(default="monthly")
++
++
++class BudgetCreate(BudgetBase):
++    ai_generated: bool = False
++
++
++class BudgetRead(BudgetBase):
++    id: int
++    ai_generated: bool
++    category: CategoryRead
++    created_at: datetime
++    updated_at: datetime
++
++    class Config:
++        orm_mode = True
++
++
++class ImportResponse(BaseModel):
++    imported: int
++    skipped: int
++    warnings: List[str] = []
++
++
++class AutoCategorizeResponse(BaseModel):
++    updated: int
++    uncategorized: int
++
++
++class InsightResponse(BaseModel):
++    title: str
++    detail: str
++    action: Optional[str] = None
++
++
++class BudgetRecommendation(BaseModel):
++    category: str
++    suggested_amount: float
++    rationale: str
+diff --git a/backend/app/crud.py b/backend/app/crud.py
+new file mode 100644
+--- /dev/null
++++ b/backend/app/crud.py
+@@ -0,0 +1,112 @@
++from __future__ import annotations
++
++from datetime import date
++from typing import Iterable, List, Optional, Sequence
++
++from sqlalchemy import func, select
++from sqlalchemy.orm import Session
++
++from . import models, schemas
++
++
++def get_or_create_category(session: Session, name: str, type_: str = "expense", *, ai_suggested: bool = False) -> models.Category:
++    category = session.execute(
++        select(models.Category).where(func.lower(models.Category.name) == name.lower())
++    ).scalar_one_or_none()
++    if category:
++        if ai_suggested and not category.ai_suggested:
++            category.ai_suggested = True
++        return category
++
++    category = models.Category(name=name, type=type_, ai_suggested=ai_suggested)
++    session.add(category)
++    session.flush()
++    return category
++
++
++def create_transaction(session: Session, transaction: schemas.TransactionCreate) -> models.Transaction:
++    db_transaction = models.Transaction(**transaction.dict())
++    session.add(db_transaction)
++    session.commit()
++    session.refresh(db_transaction)
++    return db_transaction
++
++
++def bulk_create_transactions(session: Session, transactions: Iterable[schemas.TransactionCreate]) -> List[models.Transaction]:
++    db_transactions = [models.Transaction(**t.dict()) for t in transactions]
++    session.add_all(db_transactions)
++    session.commit()
++    for t in db_transactions:
++        session.refresh(t)
++    return db_transactions
++
++
++def list_transactions(
++    session: Session,
++    *,
++    start_date: Optional[date] = None,
++    end_date: Optional[date] = None,
++    category_id: Optional[int] = None,
++    limit: int = 500,
++) -> Sequence[models.Transaction]:
++    stmt = select(models.Transaction).order_by(models.Transaction.date.desc())
++    if start_date:
++        stmt = stmt.where(models.Transaction.date >= start_date)
++    if end_date:
++        stmt = stmt.where(models.Transaction.date <= end_date)
++    if category_id:
++        stmt = stmt.where(models.Transaction.category_id == category_id)
++    stmt = stmt.limit(limit)
++    return session.execute(stmt).scalars().all()
++
++
++def list_categories(session: Session) -> Sequence[models.Category]:
++    return session.execute(select(models.Category).order_by(models.Category.name.asc())).scalars().all()
++
++
++def create_category(session: Session, data: schemas.CategoryCreate) -> models.Category:
++    category = models.Category(**data.dict())
++    session.add(category)
++    session.commit()
++    session.refresh(category)
++    return category
++
++
++def upsert_budget(
++    session: Session, *, category_id: int, amount: float, period: str = "monthly", ai_generated: bool = False
++) -> models.Budget:
++    budget = (
++        session.execute(
++            select(models.Budget).where(
++                models.Budget.category_id == category_id,
++                models.Budget.period == period,
++            )
++        ).scalar_one_or_none()
++    )
++
++    if budget:
++        budget.amount = amount
++        budget.ai_generated = ai_generated
++    else:
++        budget = models.Budget(
++            category_id=category_id,
++            amount=amount,
++            period=period,
++            ai_generated=ai_generated,
++        )
++        session.add(budget)
++
++    session.commit()
++    session.refresh(budget)
++    return budget
++
++
++def list_budgets(session: Session, *, period: Optional[str] = None) -> Sequence[models.Budget]:
++    stmt = select(models.Budget).order_by(models.Budget.amount.desc())
++    if period:
++        stmt = stmt.where(models.Budget.period == period)
++    return session.execute(stmt).scalars().all()
++
++
++def uncategorized_transactions(session: Session) -> Sequence[models.Transaction]:
++    return session.execute(select(models.Transaction).where(models.Transaction.category_id.is_(None))).scalars().all()
+diff --git a/backend/app/services/__init__.py b/backend/app/services/__init__.py
+new file mode 100644
+--- /dev/null
++++ b/backend/app/services/__init__.py
+diff --git a/backend/app/services/ai.py b/backend/app/services/ai.py
+new file mode 100644
+--- /dev/null
++++ b/backend/app/services/ai.py
+@@ -0,0 +1,147 @@
++from __future__ import annotations
++
++import json
++import os
++from statistics import mean
++from typing import Iterable, List, Optional
++
++try:
++    from openai import OpenAI
++except Exception:  # pragma: no cover
++    OpenAI = None  # type: ignore
++
++from sqlalchemy.orm import Session
++
++from .. import crud, models
++
++
++def _client() -> Optional[OpenAI]:  # type: ignore[valid-type]
++    api_key = os.getenv("OPENAI_API_KEY")
++    if not api_key or OpenAI is None:
++        return None
++    return OpenAI(api_key=api_key)
++
++
++def suggest_category_with_ai(description: str, amount: float) -> Optional[str]:
++    client = _client()
++    if not client:
++        return None
++
++    prompt = (
++        "You categorize personal finance transactions. Given the description and amount, "
++        "suggest an appropriate spending category such as Groceries, Dining Out, Utilities, "
++        "Transportation, Entertainment, Housing, Healthcare, Insurance, Salary, or Transfer. "
++        "Return only the category name."
++    )
++
++    completion = client.responses.create(
++        model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
++        input=[
++            {"role": "system", "content": prompt},
++            {"role": "user", "content": json.dumps({"description": description, "amount": amount})},
++        ],
++    )
++
++    try:
++        return completion.output[0].content[0].text.strip()
++    except Exception:
++        return None
++
++
++def generate_budget_recommendations(session: Session, transactions: Iterable[models.Transaction]) -> List[dict]:
++    client = _client()
++    category_totals: dict[str, float] = {}
++    category_counts: dict[str, int] = {}
++
++    for transaction in transactions:
++        if not transaction.category:
++            continue
++        name = transaction.category.name
++        category_totals.setdefault(name, 0.0)
++        category_counts.setdefault(name, 0)
++        category_totals[name] += transaction.amount
++        category_counts[name] += 1
++
++    summaries = [
++        {
++            "category": category,
++            "average": category_totals[category] / max(category_counts[category], 1),
++            "spend": category_totals[category],
++        }
++        for category in category_totals
++    ]
++
++    if client:
++        prompt = (
++            "You are a financial coach. Suggest a monthly budget amount for each category based on recent spending. "
++            "Respond with JSON list where each item has category, suggested_amount, rationale."
++        )
++        completion = client.responses.create(
++            model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
++            input=[
++                {"role": "system", "content": prompt},
++                {"role": "user", "content": json.dumps(summaries)},
++            ],
++        )
++        try:
++            message = completion.output[0].content[0].text
++            data = json.loads(message)
++            if isinstance(data, list):
++                return data
++        except Exception:
++            pass
++
++    # fallback heuristic
++    recommendations: List[dict] = []
++    for summary in summaries:
++        avg = summary["average"]
++        suggested = round(avg * 0.9, 2) if avg > 0 else 0.0
++        recommendations.append(
++            {
++                "category": summary["category"],
++                "suggested_amount": suggested,
++                "rationale": "Suggested at 90% of recent average spend to encourage savings.",
++            }
++        )
++    return recommendations
++
++
++def generate_insights(transactions: Iterable[models.Transaction]) -> List[dict]:
++    insights: List[dict] = []
++    expenses = [t.amount for t in transactions if t.amount < 0]
++    income = [t.amount for t in transactions if t.amount > 0]
++
++    if expenses:
++        avg_expense = mean(abs(e) for e in expenses)
++        insights.append(
++            {
++                "title": "Average expense",
++                "detail": f"Typical purchase is ${avg_expense:,.2f}.",
++            }
++        )
++
++    if income:
++        total_income = sum(income)
++        insights.append(
++            {
++                "title": "Income snapshot",
++                "detail": f"Income recorded totals ${total_income:,.2f}.",
++            }
++        )
++
++    if expenses and income:
++        burn = sum(expenses) + sum(income)
++        insights.append(
++            {
++                "title": "Net cash flow",
++                "detail": f"Net cash flow over the selected period is ${burn:,.2f}.",
++                "action": "Consider adjusting budgets for negative cash flow.",
++            }
++        )
++
++    return insights
+diff --git a/backend/app/services/categorization.py b/backend/app/services/categorization.py
+new file mode 100644
+--- /dev/null
++++ b/backend/app/services/categorization.py
+@@ -0,0 +1,70 @@
++from __future__ import annotations
++
++from collections import defaultdict
++from dataclasses import dataclass
++from typing import Dict, Iterable, List, Optional
++
++from sqlalchemy.orm import Session
++
++from .. import crud, models
++
++
++@dataclass
++class CategorizationResult:
++    transaction: models.Transaction
++    category: Optional[models.Category]
++
++
++KEYWORD_CATEGORIES: Dict[str, str] = {
++    "grocery": "Groceries",
++    "supermarket": "Groceries",
++    "whole foods": "Groceries",
++    "trader joe": "Groceries",
++    "salary": "Salary",
++    "payroll": "Salary",
++    "uber": "Transportation",
++    "lyft": "Transportation",
++    "shell": "Fuel",
++    "exxon": "Fuel",
++    "rent": "Housing",
++    "mortgage": "Housing",
++    "netflix": "Entertainment",
++    "hulu": "Entertainment",
++    "spotify": "Entertainment",
++    "prime": "Entertainment",
++    "insurance": "Insurance",
++    "medical": "Healthcare",
++    "pharmacy": "Healthcare",
++    "restaurant": "Dining Out",
++    "cafe": "Dining Out",
++    "starbucks": "Dining Out",
++    "deposit": "Income",
++    "transfer": "Transfer",
++}
++
++
++def categorize_transaction(session: Session, transaction: models.Transaction) -> Optional[models.Category]:
++    description = transaction.description.lower()
++    matches: Dict[str, int] = defaultdict(int)
++    for keyword, category_name in KEYWORD_CATEGORIES.items():
++        if keyword in description:
++            matches[category_name] += 1
++
++    if not matches:
++        return None
++
++    best_category_name = max(matches, key=matches.get)
++    return crud.get_or_create_category(session, best_category_name, ai_suggested=True)
++
++
++def categorize_transactions(session: Session, transactions: Iterable[models.Transaction]) -> List[CategorizationResult]:
++    results: List[CategorizationResult] = []
++    for transaction in transactions:
++        if transaction.category_id is not None:
++            continue
++        category = categorize_transaction(session, transaction)
++        if category:
++            transaction.category_id = category.id
++        results.append(CategorizationResult(transaction=transaction, category=category))
++    session.commit()
++    return results
+diff --git a/backend/app/services/importers.py b/backend/app/services/importers.py
+new file mode 100644
+--- /dev/null
++++ b/backend/app/services/importers.py
+@@ -0,0 +1,84 @@
++from __future__ import annotations
++
++import csv
++from datetime import datetime
++from io import StringIO
++from typing import List, Tuple
++
++from .. import schemas
++
++COMMON_DATE_FORMATS = ["%Y-%m-%d", "%m/%d/%Y", "%d/%m/%Y"]
++
++
++def parse_date(value: str) -> datetime.date:
++    for fmt in COMMON_DATE_FORMATS:
++        try:
++            return datetime.strptime(value.strip(), fmt).date()
++        except ValueError:
++            continue
++    raise ValueError(f"Unable to parse date: {value}")
++
++
++def normalize_amount(value: str) -> float:
++    value = value.replace(",", "").replace("$", "").strip()
++    if value.startswith("(") and value.endswith(")"):
++        value = f"-{value[1:-1]}"
++    return float(value)
++
++
++HEADER_MAPPINGS = {
++    "date": {"date", "transaction date", "posted date", "trans date"},
++    "description": {"description", "name", "memo", "details"},
++    "amount": {"amount", "transaction amount", "value"},
++    "category": {"category", "type", "spending category"},
++    "account": {"account", "account name", "card"},
++}
++
++
++def identify_column(header: str) -> Tuple[str, str] | None:
++    normalized = header.strip().lower()
++    for key, options in HEADER_MAPPINGS.items():
++        if normalized in options:
++            return key, header
++    return None
++
++
++def extract_transactions(csv_content: str, *, default_source: str | None = None) -> List[schemas.TransactionCreate]:
++    reader = csv.DictReader(StringIO(csv_content))
++    column_map: dict[str, str] = {}
++    for field in reader.fieldnames or []:
++        match = identify_column(field)
++        if match:
++            column_map[match[0]] = field
++
++    required = {"date", "description", "amount"}
++    if not required.issubset(column_map):
++        missing = required - set(column_map)
++        raise ValueError(f"Missing required columns: {', '.join(missing)}")
++
++    transactions: List[schemas.TransactionCreate] = []
++    for row in reader:
++        try:
++            date = parse_date(row[column_map["date"]])
++            description = row[column_map["description"]].strip()
++            amount = normalize_amount(row[column_map["amount"]])
++            category_name = row.get(column_map.get("category", ""), "").strip()
++            account_name = row.get(column_map.get("account", ""), "").strip() or None
++        except Exception as exc:
++            raise ValueError(f"Error processing row {row}: {exc}") from exc
++
++        metadata = {"source_row": row}
++        transaction = schemas.TransactionCreate(
++            date=date,
++            description=description,
++            amount=amount,
++            account_name=account_name,
++            source=default_source,
++            metadata=metadata,
++        )
++        if category_name:
++            transaction.category_id = None
++            transaction.metadata["category_hint"] = category_name
++        transactions.append(transaction)
++
++    return transactions
+diff --git a/backend/app/services/plaid.py b/backend/app/services/plaid.py
+new file mode 100644
+--- /dev/null
++++ b/backend/app/services/plaid.py
+@@ -0,0 +1,44 @@
++from __future__ import annotations
++
++import os
++from datetime import date
++from typing import List, Optional
++
++try:
++    from plaid import Client
++    from plaid.model.transactions_get_request import TransactionsGetRequest
++    from plaid.model.transactions_get_request_options import TransactionsGetRequestOptions
++except Exception:  # pragma: no cover
++    Client = None  # type: ignore
++
++
++def _client() -> Optional[Client]:  # type: ignore[valid-type]
++    if Client is None:
++        return None
++    client_id = os.getenv("PLAID_CLIENT_ID")
++    secret = os.getenv("PLAID_SECRET")
++    environment = os.getenv("PLAID_ENV", "sandbox")
++    if not client_id or not secret:
++        return None
++    return Client(client_id=client_id, secret=secret, environment=environment)
++
++
++def fetch_transactions(
++    *,
++    access_token: str,
++    start_date: date,
++    end_date: date,
++    count: int = 250,
++) -> List[dict]:
++    client = _client()
++    if not client:
++        raise RuntimeError("Plaid client not configured. Set PLAID_CLIENT_ID and PLAID_SECRET.")
++
++    request = TransactionsGetRequest(
++        access_token=access_token,
++        start_date=start_date,
++        end_date=end_date,
++        options=TransactionsGetRequestOptions(count=count),
++    )
++    response = client.transactions_get(request)
++    return [txn.to_dict() for txn in response["transactions"]]
+diff --git a/backend/app/routers/__init__.py b/backend/app/routers/__init__.py
+new file mode 100644
+--- /dev/null
++++ b/backend/app/routers/__init__.py
+diff --git a/backend/app/routers/categories.py b/backend/app/routers/categories.py
+new file mode 100644
+--- /dev/null
++++ b/backend/app/routers/categories.py
+@@ -0,0 +1,26 @@
++from __future__ import annotations
++
++from typing import List
++
++from fastapi import APIRouter, Depends
++from sqlalchemy.orm import Session
++
++from .. import crud, schemas
++from ..database import get_session
++
++router = APIRouter(prefix="/categories", tags=["categories"])
++
++
++def get_db():
++    with get_session() as session:
++        yield session
++
++
++@router.get("", response_model=List[schemas.CategoryRead])
++def list_categories(*, session: Session = Depends(get_db)):
++    return crud.list_categories(session)
++
++
++@router.post("", response_model=schemas.CategoryRead)
++def create_category(*, session: Session = Depends(get_db), category: schemas.CategoryCreate):
++    return crud.create_category(session, category)
+diff --git a/backend/app/routers/budgets.py b/backend/app/routers/budgets.py
+new file mode 100644
+--- /dev/null
++++ b/backend/app/routers/budgets.py
+@@ -0,0 +1,40 @@
++from __future__ import annotations
++
++from typing import List, Optional
++
++from fastapi import APIRouter, Depends
++from sqlalchemy.orm import Session
++
++from .. import crud, schemas
++from ..database import get_session
++from ..services import ai
++
++router = APIRouter(prefix="/budgets", tags=["budgets"])
++
++
++def get_db():
++    with get_session() as session:
++        yield session
++
++
++@router.get("", response_model=List[schemas.BudgetRead])
++def list_budgets(*, session: Session = Depends(get_db), period: Optional[str] = None):
++    return crud.list_budgets(session, period=period)
++
++
++@router.post("/auto", response_model=List[schemas.BudgetRead])
++def auto_generate_budgets(*, session: Session = Depends(get_db)):
++    transactions = crud.list_transactions(session, limit=1000)
++    recommendations = ai.generate_budget_recommendations(session, transactions)
++    budgets = []
++    for recommendation in recommendations:
++        category = crud.get_or_create_category(session, recommendation["category"], ai_suggested=True)
++        budget = crud.upsert_budget(
++            session,
++            category_id=category.id,
++            amount=recommendation["suggested_amount"],
++            period="monthly",
++            ai_generated=True,
++        )
++        budgets.append(budget)
++    return budgets
+diff --git a/backend/app/routers/insights.py b/backend/app/routers/insights.py
+new file mode 100644
+--- /dev/null
++++ b/backend/app/routers/insights.py
+@@ -0,0 +1,24 @@
++from __future__ import annotations
++
++from typing import List
++
++from fastapi import APIRouter, Depends
++from sqlalchemy.orm import Session
++
++from .. import crud, schemas
++from ..database import get_session
++from ..services import ai
++
++router = APIRouter(prefix="/insights", tags=["insights"])
++
++
++def get_db():
++    with get_session() as session:
++        yield session
++
++
++@router.get("", response_model=List[schemas.InsightResponse])
++def get_insights(*, session: Session = Depends(get_db)):
++    transactions = crud.list_transactions(session, limit=500)
++    insights = ai.generate_insights(transactions)
++    return [schemas.InsightResponse(**insight) for insight in insights]
+diff --git a/backend/app/routers/transactions.py b/backend/app/routers/transactions.py
+new file mode 100644
+--- /dev/null
++++ b/backend/app/routers/transactions.py
+@@ -0,0 +1,126 @@
++from __future__ import annotations
++
++from datetime import date
++from typing import List, Optional
++
++from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
++from sqlalchemy.orm import Session
++
++from .. import crud, models, schemas
++from ..database import get_session
++from ..services import ai, categorization, importers
++
++router = APIRouter(prefix="/transactions", tags=["transactions"])
++
++
++def get_db():
++    with get_session() as session:
++        yield session
++
++
++@router.get("", response_model=List[schemas.TransactionRead])
++def list_transactions(
++    *,
++    session: Session = Depends(get_db),
++    start_date: Optional[date] = None,
++    end_date: Optional[date] = None,
++    category_id: Optional[int] = None,
++    limit: int = 500,
++):
++    transactions = crud.list_transactions(
++        session,
++        start_date=start_date,
++        end_date=end_date,
++        category_id=category_id,
++        limit=limit,
++    )
++    return transactions
++
++
++@router.post("", response_model=schemas.TransactionRead)
++def create_transaction(*, session: Session = Depends(get_db), transaction: schemas.TransactionCreate):
++    return crud.create_transaction(session, transaction)
++
++
++@router.post("/import/csv", response_model=schemas.ImportResponse)
++async def import_csv(
++    *,
++    session: Session = Depends(get_db),
++    file: UploadFile = File(...),
++    source: Optional[str] = None,
++):
++    content = (await file.read()).decode("utf-8")
++    try:
++        transactions = importers.extract_transactions(content, default_source=source or file.filename)
++    except ValueError as exc:
++        raise HTTPException(status_code=400, detail=str(exc)) from exc
++
++    created = crud.bulk_create_transactions(session, transactions)
++
++    for transaction in created:
++        category_hint = transaction.metadata.get("category_hint") if transaction.metadata else None
++        if category_hint:
++            category = crud.get_or_create_category(session, category_hint, ai_suggested=True)
++            transaction.category_id = category.id
++    session.commit()
++
++    return schemas.ImportResponse(imported=len(created), skipped=0, warnings=[])
++
++
++@router.post("/import/plaid", response_model=schemas.ImportResponse)
++def import_plaid(
++    *,
++    session: Session = Depends(get_db),
++    access_token: str,
++    start_date: date,
++    end_date: date,
++):
++    from ..services import plaid
++
++    try:
++        transactions = plaid.fetch_transactions(
++            access_token=access_token,
++            start_date=start_date,
++            end_date=end_date,
++        )
++    except RuntimeError as exc:
++        raise HTTPException(status_code=400, detail=str(exc)) from exc
++
++    new_transactions = []
++    for txn in transactions:
++        amount = float(txn.get("amount", 0)) * -1  # Plaid uses positive for expenses
++        metadata = {"plaid": txn}
++        new_transactions.append(
++            schemas.TransactionCreate(
++                date=txn.get("date"),
++                description=txn.get("name", "Plaid transaction"),
++                amount=amount,
++                account_name=txn.get("account_id"),
++                source="plaid",
++                metadata=metadata,
++            )
++        )
++
++    crud.bulk_create_transactions(session, new_transactions)
++    return schemas.ImportResponse(imported=len(new_transactions), skipped=0, warnings=[])
++
++
++@router.post("/auto-categorize", response_model=schemas.AutoCategorizeResponse)
++def auto_categorize(*, session: Session = Depends(get_db)):
++    uncategorized = crud.uncategorized_transactions(session)
++    updated = 0
++    for transaction in uncategorized:
++        category = categorization.categorize_transaction(session, transaction)
++        if not category:
++            suggestion = ai.suggest_category_with_ai(transaction.description, transaction.amount)
++            if suggestion:
++                category = crud.get_or_create_category(session, suggestion, ai_suggested=True)
++        if category:
++            transaction.category_id = category.id
++            updated += 1
++    session.commit()
++    return schemas.AutoCategorizeResponse(updated=updated, uncategorized=len(uncategorized) - updated)
+diff --git a/backend/app/main.py b/backend/app/main.py
+new file mode 100644
+--- /dev/null
++++ b/backend/app/main.py
+@@ -0,0 +1,30 @@
++from __future__ import annotations
++
++from fastapi import FastAPI
++from fastapi.middleware.cors import CORSMiddleware
++
++from .database import Base, engine
++from .routers import budgets, categories, insights, transactions
++
++Base.metadata.create_all(bind=engine)
++
++app = FastAPI(title="Financial Tracking API", version="1.0.0")
++
++app.add_middleware(
++    CORSMiddleware,
++    allow_origins=["*"],
++    allow_credentials=True,
++    allow_methods=["*"],
++    allow_headers=["*"],
++)
++
++app.include_router(categories.router)
++app.include_router(transactions.router)
++app.include_router(budgets.router)
++app.include_router(insights.router)
++
++
++@app.get("/")
++def read_root():
++    return {"status": "ok"}

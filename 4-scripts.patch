@@ -1,0 +1,148 @@
+diff --git a/scripts/check_no_binaries.py b/scripts/check_no_binaries.py
+new file mode 100755
+--- /dev/null
++++ b/scripts/check_no_binaries.py
+@@ -0,0 +1,65 @@
++#!/usr/bin/env python3
++"""Detect committed files that appear to be binary artifacts.
++
++The script scans the repository for tracked files that do not decode as UTF-8
++text. It helps keep the project source-only so PRs are not blocked by binary
++assets. Returns a non-zero exit code if a binary file is detected.
++"""
++
++from __future__ import annotations
++
++import subprocess
++from pathlib import Path
++
++REPO_ROOT = Path(__file__).resolve().parents[1]
++
++
++def git_tracked_files() -> list[Path]:
++    result = subprocess.run(
++        ["git", "ls-files"],
++        cwd=REPO_ROOT,
++        check=True,
++        text=True,
++        capture_output=True,
++    )
++    return [REPO_ROOT / Path(line.strip()) for line in result.stdout.splitlines() if line.strip()]
++
++
++def is_binary(path: Path) -> bool:
++    try:
++        data = path.read_bytes()
++    except OSError:
++        return False
++
++    if not data:
++        return False
++
++    if b"\0" in data:
++        return True
++
++    try:
++        data.decode("utf-8")
++        return False
++    except UnicodeDecodeError:
++        return True
++
++
++def main() -> int:
++    binaries: list[Path] = []
++    for file_path in git_tracked_files():
++        if is_binary(file_path):
++            binaries.append(file_path.relative_to(REPO_ROOT))
++
++    if binaries:
++        print("Binary-like files detected:\n")
++        for binary in binaries:
++            print(f" - {binary}")
++        print("\nRemove these files or add them to .gitignore before committing.")
++        return 1
++
++    print("No binary files detected among tracked sources.")
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/scripts/generate_sample_transactions.py b/scripts/generate_sample_transactions.py
+new file mode 100755
+--- /dev/null
++++ b/scripts/generate_sample_transactions.py
+@@ -0,0 +1,71 @@
++#!/usr/bin/env python3
++"""Generate synthetic transaction CSVs for local testing.
++
++The generated files live in samples/ (ignored by Git) so that developers do not
++need to commit binary spreadsheet exports.
++"""
++
++from __future__ import annotations
++
++import csv
++from dataclasses import dataclass
++from datetime import date, timedelta
++from pathlib import Path
++from random import choice, randint, uniform
++
++SAMPLES_DIR = Path("samples")
++SAMPLES_DIR.mkdir(exist_ok=True)
++
++
++@dataclass
++class SampleCategory:
++    name: str
++    descriptions: tuple[str, ...]
++    amount_range: tuple[float, float]
++
++
++CATEGORIES = [
++    SampleCategory("Groceries", ("Whole Foods", "Trader Joe's", "Supermarket"), (-120.0, -20.0)),
++    SampleCategory("Dining", ("Restaurant", "Cafe", "Delivery"), (-80.0, -10.0)),
++    SampleCategory("Transportation", ("Lyft", "Uber", "Gas Station"), (-60.0, -15.0)),
++    SampleCategory("Utilities", ("Electric", "Water", "Internet"), (-200.0, -40.0)),
++    SampleCategory("Entertainment", ("Streaming", "Bookstore", "Concert"), (-150.0, -15.0)),
++    SampleCategory("Salary", ("Payroll", "Employer Deposit"), (1500.0, 3200.0)),
++]
++
++HEADER = ["date", "description", "amount", "account", "category"]
++
++
++def generate_transactions(days: int = 60, rows: int = 200) -> list[list[str]]:
++    start = date.today() - timedelta(days=days)
++    data: list[list[str]] = []
++    for _ in range(rows):
++        day_offset = randint(0, days)
++        category = choice(CATEGORIES)
++        amount = round(uniform(*category.amount_range), 2)
++        data.append(
++            [
++                (start + timedelta(days=day_offset)).isoformat(),
++                choice(category.descriptions),
++                f"{amount:.2f}",
++                choice(["Checking", "Credit Card", "Savings"]),
++                category.name,
++            ]
++        )
++    return sorted(data, key=lambda row: row[0], reverse=True)
++
++
++def write_csv(filename: str, rows: list[list[str]]) -> None:
++    path = (SAMPLES_DIR / filename).resolve()
++    with path.open("w", newline="") as f:
++        writer = csv.writer(f)
++        writer.writerow(HEADER)
++        writer.writerows(rows)
++    print(f"wrote {path}")
++
++
++def main() -> None:
++    rows = generate_transactions()
++    write_csv("transactions_sample.csv", rows)
++
++
++if __name__ == "__main__":
++    main()
